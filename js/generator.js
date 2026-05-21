@@ -6,11 +6,22 @@ Blockly.Python.INDENT = '    ';
 let _defs     = Object.create(null);  // imports + initialisierungen
 let _setupCode = '';                  // Code aus dem SETUP-Block
 
-const _origWorkspaceToCode = Blockly.Python.workspaceToCode.bind(Blockly.Python);
 Blockly.Python.workspaceToCode = function(workspace) {
   _defs      = Object.create(null);
   _setupCode = '';
-  return _origWorkspaceToCode(workspace);
+
+  // init für Blockly-interne Variablen (nameDB_ etc.)
+  try { Blockly.Python.init(workspace); } catch(_) {}
+
+  // Nur SETUP + FÜR IMMER verarbeiten – schwebende Blöcke werden ignoriert
+  const setupBlock   = workspace.getBlocksByType('control_setup',   false)[0];
+  const foreverBlock = workspace.getBlocksByType('control_forever',  false)[0];
+
+  let loopCode = '';
+  if (setupBlock)   Blockly.Python['control_setup'].call(Blockly.Python, setupBlock);
+  if (foreverBlock) loopCode = Blockly.Python['control_forever'].call(Blockly.Python, foreverBlock) || '';
+
+  return Blockly.Python.finish(loopCode);
 };
 
 // Hilfsfunktion: Hex → CircuitPython RGB-Tuple
