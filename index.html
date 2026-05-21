@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CircuitBlox – MakeYourSchool</title>
+
+  <!-- Blockly 9 -->
+  <script src="https://unpkg.com/blockly@9.3.3/blockly_compressed.js"></script>
+  <script src="https://unpkg.com/blockly@9.3.3/blocks_compressed.js"></script>
+  <script src="https://unpkg.com/blockly@9.3.3/python_compressed.js"></script>
+  <script src="https://unpkg.com/blockly@9.3.3/msg/de.js"></script>
+
+  <!-- CodeMirror -->
+  <link  rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link  rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <header id="header">
+    <div class="logo">
+      <span class="logo-icon">⚡</span>
+      <span class="logo-text">CircuitBlox</span>
+      <span class="logo-sub">MakeYourSchool · MAKER-PI-RP2040</span>
+    </div>
+
+    <div class="connection-area">
+      <div class="status-indicator">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">Nicht verbunden</span>
+      </div>
+      <button id="btn-connect" class="btn btn-primary">Verbinden</button>
+      <button id="btn-run"  class="btn btn-warning" disabled>▶ Ausführen</button>
+      <button id="btn-stop" class="btn btn-danger"  disabled>⏹ Stopp</button>
+    </div>
+  </header>
+
+  <!-- ── Haupt-Layout ────────────────────────────────────────────────────── -->
+  <div id="main">
+
+    <!-- Blockly -->
+    <div id="blockly-panel">
+      <div id="blockly-workspace"></div>
+    </div>
+
+    <!-- Resize-Divider -->
+    <div id="divider"></div>
+
+    <!-- Code + Serial Panel -->
+    <div id="code-panel">
+
+      <!-- Code-Header -->
+      <div class="panel-header">
+        <span>CircuitPython Code</span>
+        <div class="panel-actions">
+          <button id="btn-copy"        class="btn-icon" title="Code kopieren">📋</button>
+          <button id="btn-toggle-edit" class="btn-icon" title="Code bearbeiten">✏️</button>
+        </div>
+      </div>
+
+      <!-- CodeMirror -->
+      <div id="code-editor-wrapper">
+        <textarea id="code-editor"></textarea>
+      </div>
+
+      <!-- Serial Monitor Header -->
+      <div class="panel-header">
+        <span>Serieller Monitor</span>
+        <button id="btn-clear-serial" class="btn-icon" title="Löschen">🗑️</button>
+      </div>
+
+      <!-- Serial Output -->
+      <div id="serial-output"></div>
+
+      <!-- Serial Input -->
+      <div id="serial-input-row">
+        <input id="serial-input" type="text"
+               placeholder="Befehl senden (Enter)…" disabled>
+        <button id="btn-send" class="btn btn-ghost" disabled>Senden</button>
+      </div>
+
+    </div><!-- /code-panel -->
+  </div><!-- /main -->
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <!-- App-Skripte -->
+  <script src="js/boards.js"></script>
+  <script src="js/blocks/control.js"></script>
+  <script src="js/blocks/sensors.js"></script>
+  <script src="js/blocks/actuators.js"></script>
+  <script src="js/toolbox.js"></script>
+  <script src="js/generator.js"></script>
+  <script src="js/serial.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- Resize-Divider Logik -->
+  <script>
+    (function() {
+      const divider = document.getElementById('divider');
+      const panel   = document.getElementById('code-panel');
+      let dragging  = false;
+      let startX, startW;
+
+      divider.addEventListener('mousedown', e => {
+        dragging = true;
+        startX   = e.clientX;
+        startW   = panel.offsetWidth;
+        document.body.style.cursor    = 'col-resize';
+        document.body.style.userSelect = 'none';
+      });
+
+      document.addEventListener('mousemove', e => {
+        if (!dragging) return;
+        const delta  = startX - e.clientX;
+        const newW   = Math.max(280, Math.min(800, startW + delta));
+        panel.style.width = newW + 'px';
+      });
+
+      document.addEventListener('mouseup', () => {
+        if (!dragging) return;
+        dragging = false;
+        document.body.style.cursor    = '';
+        document.body.style.userSelect = '';
+        if (window.workspace) Blockly.svgResize(window.workspace);
+      });
+    })();
+  </script>
+
+</body>
+</html>
