@@ -1,30 +1,25 @@
 // generator.js – CircuitPython Code-Generator
-// Erweitert Blockly.Python um Hardware-Blöcke für das MAKER-PI-RP2040
 
-// 4 Leerzeichen als Einrückung (CircuitPython-Standard)
 Blockly.Python.INDENT = '    ';
 
-// Modul-globales Definitions-Objekt – robuster als this.definitions_
-// (Blockly v9 hat inkonsistentes this-Binding in Generatorfunktionen)
-let _defs = Object.create(null);
+// Modul-globale Sammel-Variablen (reset vor jeder Generierung)
+let _defs     = Object.create(null);  // imports + initialisierungen
+let _setupCode = '';                  // Code aus dem SETUP-Block
 
-// workspaceToCode überschreiben: _defs vor jeder Generierung zurücksetzen
 const _origWorkspaceToCode = Blockly.Python.workspaceToCode.bind(Blockly.Python);
 Blockly.Python.workspaceToCode = function(workspace) {
-  _defs = Object.create(null);
+  _defs      = Object.create(null);
+  _setupCode = '';
   return _origWorkspaceToCode(workspace);
 };
 
-// Hilfsfunktion: Hex-Farbe (#rrggbb) → CircuitPython-Tuple (r, g, b)
+// Hilfsfunktion: Hex → CircuitPython RGB-Tuple
 function hexToRgbTuple(hex) {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `(${r}, ${g}, ${b})`;
+  return `(${parseInt(hex.slice(1,3),16)}, ${parseInt(hex.slice(3,5),16)}, ${parseInt(hex.slice(5,7),16)})`;
 }
 
-// finish() überschreiben: _defs sauber als Header einfügen
-Blockly.Python.finish = function(code) {
+// finish(): erzeugt den finalen formatierten Code
+Blockly.Python.finish = function(loopCode) {
   const imports = [];
   const inits   = [];
   for (const key of Object.keys(_defs).sort()) {
@@ -32,20 +27,30 @@ Blockly.Python.finish = function(code) {
     if (val.startsWith('import ') || val.startsWith('from ')) imports.push(val);
     else inits.push(val);
   }
+
   let result = '# === CircuitBlox – Generierter Code ===\n';
-  if (imports.length) result += imports.join('\n') + '\n';
-  if (inits.length)   result += '\n# --- Initialisierungen ---\n' + inits.join('\n') + '\n';
-  if (code.trim())    result += '\n# --- Hauptprogramm ---\n' + code;
+  if (imports.length)        result += imports.join('\n') + '\n';
+  if (inits.length)          result += '\n# --- Initialisierungen ---\n' + inits.join('\n') + '\n';
+  if (_setupCode.trim())     result += '\n# --- Setup (einmalig) ---\n' + _setupCode;
+  if (loopCode.trim())       result += '\n# --- Hauptprogramm ---\nwhile True:\n' + loopCode;
   return result;
 };
 
-// ── Steuerung ────────────────────────────────────────────────────────────────
+// ── Pflicht-Startblöcke ───────────────────────────────────────────────────────
+
+Blockly.Python['control_setup'] = function(block) {
+  // Code landet in _setupCode, nicht im Loop
+  _setupCode = Blockly.Python.statementToCode(block, 'DO');
+  return '';
+};
 
 Blockly.Python['control_forever'] = function(block) {
+  // Gibt nur den Loop-Body zurück – finish() packt ihn in while True:
   _defs['import_time'] = 'import time';
-  const body = Blockly.Python.statementToCode(block, 'DO') || '    pass\n';
-  return `while True:\n${body}`;
+  return Blockly.Python.statementToCode(block, 'DO') || '    pass\n';
 };
+
+// ── Steuerung ────────────────────────────────────────────────────────────────
 
 Blockly.Python['control_wait'] = function(block) {
   _defs['import_time'] = 'import time';
@@ -58,43 +63,105 @@ Blockly.Python['control_print'] = function(block) {
   return `print(${val})\n`;
 };
 
-// ── Sensoren ─────────────────────────────────────────────────────────────────
+// ── Sensor-Wert-Blöcke ────────────────────────────────────────────────────────
 
 Blockly.Python['sensor_dht_temperature'] = function(block) {
   const pin = block.getFieldValue('PIN');
-  _defs['import_board']            = 'import board';
-  _defs['import_dht']              = 'import adafruit_dht';
-  _defs[`init_dht_${pin}`]         = `_dht_${pin} = adafruit_dht.DHT22(board.${pin})`;
+  _defs['import_board']     = 'import board';
+  _defs['import_dht']       = 'import adafruit_dht';
+  _defs[`init_dht_${pin}`]  = `_dht_${pin} = adafruit_dht.DHT22(board.${pin})`;
   return [`_dht_${pin}.temperature`, Blockly.Python.ORDER_MEMBER];
 };
 
 Blockly.Python['sensor_dht_humidity'] = function(block) {
   const pin = block.getFieldValue('PIN');
-  _defs['import_board']            = 'import board';
-  _defs['import_dht']              = 'import adafruit_dht';
-  _defs[`init_dht_${pin}`]         = `_dht_${pin} = adafruit_dht.DHT22(board.${pin})`;
+  _defs['import_board']     = 'import board';
+  _defs['import_dht']       = 'import adafruit_dht';
+  _defs[`init_dht_${pin}`]  = `_dht_${pin} = adafruit_dht.DHT22(board.${pin})`;
   return [`_dht_${pin}.humidity`, Blockly.Python.ORDER_MEMBER];
 };
 
 Blockly.Python['sensor_ultrasonic'] = function(block) {
   const trig = block.getFieldValue('TRIG');
   const echo = block.getFieldValue('ECHO');
-  _defs['import_board']    = 'import board';
-  _defs['import_hcsr04']   = 'import adafruit_hcsr04';
-  _defs['init_sonar']      =
+  _defs['import_board']   = 'import board';
+  _defs['import_hcsr04']  = 'import adafruit_hcsr04';
+  _defs['init_sonar']     =
     `_sonar = adafruit_hcsr04.HCSR04(trigger_pin=board.${trig}, echo_pin=board.${echo})`;
   return ['_sonar.distance', Blockly.Python.ORDER_MEMBER];
 };
 
+Blockly.Python['sensor_ldr'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  _defs['import_board']    = 'import board';
+  _defs['import_analogio'] = 'import analogio';
+  _defs[`init_ldr_${pin}`] = `_ldr_${pin} = analogio.AnalogIn(board.${pin})`;
+  // Normiert auf 0–100 %
+  return [`round(_ldr_${pin}.value / 65535 * 100)`, Blockly.Python.ORDER_FUNCTION_CALL];
+};
+
 Blockly.Python['sensor_button'] = function(block) {
-  const btn  = block.getFieldValue('BTN');
-  const pin  = BOARD.buttons[btn];
+  const btn = block.getFieldValue('BTN');
+  const pin = BOARD.buttons[btn];
   _defs['import_board']     = 'import board';
   _defs['import_digitalio'] = 'import digitalio';
   _defs[`init_btn_${btn}`]  =
     `_btn_${btn} = digitalio.DigitalInOut(board.${pin})\n` +
     `_btn_${btn}.switch_to_input(pull=digitalio.Pull.UP)`;
   return [`(not _btn_${btn}.value)`, Blockly.Python.ORDER_NONE];
+};
+
+// ── Ereignis-Blöcke ───────────────────────────────────────────────────────────
+
+Blockly.Python['event_temperature'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  const op  = block.getFieldValue('OP');
+  const val = Blockly.Python.valueToCode(block, 'VALUE', Blockly.Python.ORDER_NONE) || '25';
+  const body = Blockly.Python.statementToCode(block, 'DO') || '    pass\n';
+  _defs['import_board']     = 'import board';
+  _defs['import_dht']       = 'import adafruit_dht';
+  _defs[`init_dht_${pin}`]  = `_dht_${pin} = adafruit_dht.DHT22(board.${pin})`;
+  return `if _dht_${pin}.temperature ${op} ${val}:\n${body}`;
+};
+
+Blockly.Python['event_ultrasonic'] = function(block) {
+  const trig = block.getFieldValue('TRIG');
+  const echo = block.getFieldValue('ECHO');
+  const op   = block.getFieldValue('OP');
+  const val  = Blockly.Python.valueToCode(block, 'VALUE', Blockly.Python.ORDER_NONE) || '20';
+  const body = Blockly.Python.statementToCode(block, 'DO') || '    pass\n';
+  _defs['import_board']  = 'import board';
+  _defs['import_hcsr04'] = 'import adafruit_hcsr04';
+  _defs['init_sonar']    =
+    `_sonar = adafruit_hcsr04.HCSR04(trigger_pin=board.${trig}, echo_pin=board.${echo})`;
+  return `if _sonar.distance ${op} ${val}:\n${body}`;
+};
+
+Blockly.Python['event_ldr'] = function(block) {
+  const pin  = block.getFieldValue('PIN');
+  const op   = block.getFieldValue('OP');
+  const val  = Blockly.Python.valueToCode(block, 'VALUE', Blockly.Python.ORDER_NONE) || '50';
+  const body = Blockly.Python.statementToCode(block, 'DO') || '    pass\n';
+  _defs['import_board']    = 'import board';
+  _defs['import_analogio'] = 'import analogio';
+  _defs[`init_ldr_${pin}`] = `_ldr_${pin} = analogio.AnalogIn(board.${pin})`;
+  return `if round(_ldr_${pin}.value / 65535 * 100) ${op} ${val}:\n${body}`;
+};
+
+Blockly.Python['event_button'] = function(block) {
+  const btn   = block.getFieldValue('BTN');
+  const state = block.getFieldValue('STATE');
+  const pin   = BOARD.buttons[btn];
+  const body  = Blockly.Python.statementToCode(block, 'DO') || '    pass\n';
+  _defs['import_board']     = 'import board';
+  _defs['import_digitalio'] = 'import digitalio';
+  _defs[`init_btn_${btn}`]  =
+    `_btn_${btn} = digitalio.DigitalInOut(board.${pin})\n` +
+    `_btn_${btn}.switch_to_input(pull=digitalio.Pull.UP)`;
+  const condition = state === 'pressed'
+    ? `not _btn_${btn}.value`
+    : `_btn_${btn}.value`;
+  return `if ${condition}:\n${body}`;
 };
 
 // ── Aktoren: LED ─────────────────────────────────────────────────────────────
@@ -137,10 +204,10 @@ Blockly.Python['actuator_servo'] = function(block) {
                    S3: BOARD.servos.S3, S4: BOARD.servos.S4 };
   const pin   = pinMap[s];
   const angle = Blockly.Python.valueToCode(block, 'ANGLE', Blockly.Python.ORDER_NONE) || '90';
-  _defs['import_board']    = 'import board';
-  _defs['import_pwmio']    = 'import pwmio';
-  _defs['from_servo']      = 'from adafruit_motor import servo as _servo_mod';
-  _defs[`init_srv_${s}`]   =
+  _defs['import_board']  = 'import board';
+  _defs['import_pwmio']  = 'import pwmio';
+  _defs['from_servo']    = 'from adafruit_motor import servo as _servo_mod';
+  _defs[`init_srv_${s}`] =
     `_pwm_${s} = pwmio.PWMOut(board.${pin}, duty_cycle=2 ** 15, frequency=50)\n` +
     `_servo_${s} = _servo_mod.Servo(_pwm_${s})`;
   return `_servo_${s}.angle = ${angle}\n`;
@@ -157,12 +224,7 @@ Blockly.Python['actuator_buzzer'] = function(block) {
   _defs['import_pwmio']  = 'import pwmio';
   _defs['init_buzzer']   =
     `_buzz = pwmio.PWMOut(board.${pin}, variable_frequency=True)\n_buzz.duty_cycle = 0`;
-  return (
-    `_buzz.frequency = ${freq}\n` +
-    `_buzz.duty_cycle = 32768\n` +
-    `time.sleep(${dur})\n` +
-    `_buzz.duty_cycle = 0\n`
-  );
+  return `_buzz.frequency = ${freq}\n_buzz.duty_cycle = 32768\ntime.sleep(${dur})\n_buzz.duty_cycle = 0\n`;
 };
 
 Blockly.Python['actuator_buzzer_off'] = function(_block) {
@@ -177,10 +239,10 @@ Blockly.Python['actuator_buzzer_off'] = function(_block) {
 
 function _motorDefs(motorKey) {
   const pins = BOARD.motors[motorKey];
-  _defs['import_board']           = 'import board';
-  _defs['import_pwmio']           = 'import pwmio';
-  _defs['from_motor']             = 'from adafruit_motor import motor as _motor_mod';
-  _defs[`init_mot_${motorKey}`]   =
+  _defs['import_board']         = 'import board';
+  _defs['import_pwmio']         = 'import pwmio';
+  _defs['from_motor']           = 'from adafruit_motor import motor as _motor_mod';
+  _defs[`init_mot_${motorKey}`] =
     `_m${motorKey}a = pwmio.PWMOut(board.${pins.pinA}, frequency=50)\n` +
     `_m${motorKey}b = pwmio.PWMOut(board.${pins.pinB}, frequency=50)\n` +
     `_motor_${motorKey} = _motor_mod.DCMotor(_m${motorKey}a, _m${motorKey}b)`;
@@ -216,16 +278,13 @@ function _neopixelDefs() {
 }
 
 Blockly.Python['neopixel_set'] = function(block) {
-  const idx   = parseInt(block.getFieldValue('INDEX'), 10);
-  const color = block.getFieldValue('COLOR');
   _neopixelDefs();
-  return `_pixels[${idx - 1}] = ${hexToRgbTuple(color)}\n_pixels.show()\n`;
+  return `_pixels[${parseInt(block.getFieldValue('INDEX'),10) - 1}] = ${hexToRgbTuple(block.getFieldValue('COLOR'))}\n_pixels.show()\n`;
 };
 
 Blockly.Python['neopixel_fill'] = function(block) {
-  const color = block.getFieldValue('COLOR');
   _neopixelDefs();
-  return `_pixels.fill(${hexToRgbTuple(color)})\n_pixels.show()\n`;
+  return `_pixels.fill(${hexToRgbTuple(block.getFieldValue('COLOR'))})\n_pixels.show()\n`;
 };
 
 Blockly.Python['neopixel_off'] = function(_block) {

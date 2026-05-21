@@ -1,15 +1,30 @@
 // blocks/control.js – Steuerungs-Blöcke
 
-Blockly.Blocks['control_forever'] = {
+// ── Pflicht-Startblöcke (werden via app.js in Workspace gesetzt) ──────────────
+
+Blockly.Blocks['control_setup'] = {
   init: function() {
-    this.appendStatementInput('DO')
-        .appendField('🔁 Für immer');
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-    this.setColour('#546E7A');
-    this.setTooltip('Dieser Code wird immer wieder wiederholt');
+    this.appendDummyInput()
+        .appendField('⚡  SETUP');
+    this.appendDummyInput()
+        .appendField('läuft einmal beim Start');
+    this.appendStatementInput('DO');
+    this.setColour('#37474F');
+    this.setTooltip('Code hier läuft einmal beim Einschalten / Neustart');
   }
 };
+
+Blockly.Blocks['control_forever'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField('🔁  FÜR IMMER');
+    this.appendStatementInput('DO');
+    this.setColour('#546E7A');
+    this.setTooltip('Code hier wird immer wieder wiederholt');
+  }
+};
+
+// ── Hilfsmittel (in Toolbox verfügbar) ───────────────────────────────────────
 
 Blockly.Blocks['control_wait'] = {
   init: function() {

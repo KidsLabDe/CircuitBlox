@@ -38,23 +38,21 @@ function initBlockly() {
     grid: { spacing: 20, length: 3, colour: '#d8dde8', snap: true },
   });
 
-  // Startblock: "Für immer" mit "Warte 1 Sek" als Beispiel
-  const startXml = `
-    <xml>
-      <block type="control_forever" x="30" y="30">
-        <statement name="DO">
-          <block type="control_print">
-            <value name="VALUE">
-              <shadow type="text"><field name="TEXT">Hallo CircuitBlox!</field></shadow>
-            </value>
-          </block>
-        </statement>
-      </block>
-    </xml>`;
-  Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(startXml), workspace);
+  // Feste Pflicht-Blöcke: SETUP + FÜR IMMER (nicht löschbar, nicht verschiebbar)
+  _createFixedBlock('control_setup',  30, 30);
+  _createFixedBlock('control_forever', 30, 200);
 
   // Live Code-Generierung bei jeder Änderung
   workspace.addChangeListener(updateCode);
+}
+
+function _createFixedBlock(type, x, y) {
+  const block = workspace.newBlock(type);
+  block.initSvg();
+  block.render();
+  block.moveBy(x, y);
+  block.setDeletable(false);
+  block.setMovable(false);
 }
 
 function initCodeEditor() {

@@ -1,4 +1,5 @@
-// toolbox.js – Blockly Toolbox-Definition (JSON-Format)
+// toolbox.js – Blockly Toolbox-Definition
+// SETUP und FÜR IMMER sind NICHT hier – sie sind fest im Workspace verankert.
 
 const TOOLBOX = {
   kind: 'categoryToolbox',
@@ -8,7 +9,6 @@ const TOOLBOX = {
       name: '🔁 Steuerung',
       colour: '#546E7A',
       contents: [
-        { kind: 'block', type: 'control_forever' },
         { kind: 'block', type: 'control_wait',
           inputs: { SECONDS: { shadow: { type: 'math_number', fields: { NUM: 1 } } } } },
         { kind: 'block', type: 'control_print' },
@@ -24,10 +24,22 @@ const TOOLBOX = {
       name: '🔵 Sensoren',
       colour: '#1565C0',
       contents: [
+        // Wert-Blöcke
+        { kind: 'label', text: '── Messwerte ──' },
         { kind: 'block', type: 'sensor_dht_temperature' },
         { kind: 'block', type: 'sensor_dht_humidity' },
         { kind: 'block', type: 'sensor_ultrasonic' },
+        { kind: 'block', type: 'sensor_ldr' },
         { kind: 'block', type: 'sensor_button' },
+        // Ereignis-Blöcke
+        { kind: 'label', text: '── Ereignisse ──' },
+        { kind: 'block', type: 'event_temperature',
+          inputs: { VALUE: { shadow: { type: 'math_number', fields: { NUM: 25 } } } } },
+        { kind: 'block', type: 'event_ultrasonic',
+          inputs: { VALUE: { shadow: { type: 'math_number', fields: { NUM: 20 } } } } },
+        { kind: 'block', type: 'event_ldr',
+          inputs: { VALUE: { shadow: { type: 'math_number', fields: { NUM: 50 } } } } },
+        { kind: 'block', type: 'event_button' },
       ]
     },
     {
@@ -77,9 +89,7 @@ const TOOLBOX = {
         { kind: 'block', type: 'neopixel_off' },
       ]
     },
-    {
-      kind: 'sep'
-    },
+    { kind: 'sep' },
     {
       kind: 'category',
       name: '📐 Mathematik',
@@ -90,8 +100,8 @@ const TOOLBOX = {
         { kind: 'block', type: 'math_single' },
         { kind: 'block', type: 'math_constrain',
           inputs: {
-            LOW:   { shadow: { type: 'math_number', fields: { NUM: 0 } } },
-            HIGH:  { shadow: { type: 'math_number', fields: { NUM: 100 } } }
+            LOW:  { shadow: { type: 'math_number', fields: { NUM: 0 } } },
+            HIGH: { shadow: { type: 'math_number', fields: { NUM: 100 } } }
           }
         },
         { kind: 'block', type: 'math_random_int',
