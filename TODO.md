@@ -1,11 +1,12 @@
 # CircuitBlox – TODO & Ideen
 
-## Phase 2 – Serial-Verbindung (nächster Schritt)
-- [ ] Web Serial API vollständig verdrahten (serial.js ist vorbereitet)
-- [ ] "▶ Ausführen" Button: Code per Raw REPL auf Board laden und starten
-- [ ] "⏹ Stopp" Button: Ctrl+C über Serial
-- [ ] Serieller Monitor: Live-Output von `print()` anzeigen
-- [ ] Eingabefeld im Serial Monitor: manuelle REPL-Befehle senden
+## ✅ Phase 2 – Serial-Verbindung (erledigt)
+- [x] Web Serial API implementiert (serial.js)
+- [x] "▶ Ausführen" Button: Code per Raw REPL auf Board laden und starten
+- [x] "⏹ Stopp" Button: Ctrl+C über Serial
+- [x] Serieller Monitor: Live-Output von `print()` anzeigen
+- [x] Eingabefeld im Serial Monitor: manuelle REPL-Befehle senden
+- [ ] **Praxistest mit echtem MAKER-PI-RP2040 noch ausstehend**
 
 ## Phase 2.5 – Code persistent speichern
 - [ ] **"💾 Als code.py speichern"** via File System Access API
