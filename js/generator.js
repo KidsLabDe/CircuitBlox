@@ -302,3 +302,295 @@ Blockly.Python['neopixel_off'] = function(_block) {
   _neopixelDefs();
   return `_pixels.fill((0, 0, 0))\n_pixels.show()\n`;
 };
+
+// ── Hilfsfunktionen für neue Blöcke ──────────────────────────────────────────
+
+function _digitalInDef(pin, varPrefix, pull) {
+  _defs['import_board']     = 'import board';
+  _defs['import_digitalio'] = 'import digitalio';
+  _defs[`init_${varPrefix}_${pin}`] =
+    `_${varPrefix}_${pin} = digitalio.DigitalInOut(board.${pin})\n` +
+    `_${varPrefix}_${pin}.switch_to_input(pull=digitalio.Pull.${pull})`;
+}
+
+function _digitalOutDef(pin, varPrefix) {
+  _defs['import_board']     = 'import board';
+  _defs['import_digitalio'] = 'import digitalio';
+  _defs[`init_${varPrefix}_${pin}`] =
+    `_${varPrefix}_${pin} = digitalio.DigitalInOut(board.${pin})\n` +
+    `_${varPrefix}_${pin}.direction = digitalio.Direction.OUTPUT`;
+}
+
+// ── Digital-Sensor-Generatoren ────────────────────────────────────────────────
+
+Blockly.Python['sensor_obstacle'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  _digitalInDef(pin, 'obstacle', 'DOWN');
+  return [`(not _obstacle_${pin}.value)`, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Python['sensor_line'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  _digitalInDef(pin, 'line', 'DOWN');
+  return [`_line_${pin}.value`, Blockly.Python.ORDER_MEMBER];
+};
+
+Blockly.Python['sensor_tilt'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  _digitalInDef(pin, 'tilt', 'DOWN');
+  return [`(not _tilt_${pin}.value)`, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Python['sensor_magnetic'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  _digitalInDef(pin, 'mag', 'DOWN');
+  return [`(not _mag_${pin}.value)`, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Python['sensor_flame'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  _digitalInDef(pin, 'flame', 'DOWN');
+  return [`(not _flame_${pin}.value)`, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Python['sensor_sound'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  _digitalInDef(pin, 'sound', 'DOWN');
+  return [`(not _sound_${pin}.value)`, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Python['sensor_touch'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  _digitalInDef(pin, 'touch', 'DOWN');
+  return [`(not _touch_${pin}.value)`, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Python['sensor_vibration'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  _digitalInDef(pin, 'vib', 'DOWN');
+  return [`(not _vib_${pin}.value)`, Blockly.Python.ORDER_NONE];
+};
+
+// ── Analog-Sensor-Generatoren ─────────────────────────────────────────────────
+
+Blockly.Python['sensor_analog_raw'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  _defs['import_board']    = 'import board';
+  _defs['import_analogio'] = 'import analogio';
+  _defs[`init_analog_${pin}`] = `_analog_${pin} = analogio.AnalogIn(board.${pin})`;
+  return [`round(_analog_${pin}.value / 65535 * 100)`, Blockly.Python.ORDER_FUNCTION_CALL];
+};
+
+Blockly.Python['sensor_ntc_temp'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  _defs['import_board']    = 'import board';
+  _defs['import_analogio'] = 'import analogio';
+  _defs['import_math']     = 'import math';
+  _defs[`init_ain_ntc_${pin}`] = `_ain_ntc_${pin} = analogio.AnalogIn(board.${pin})`;
+  _defs[`fn_ntc_${pin}`] =
+    `def _ntc_${pin}():\n` +
+    `    _v = _ain_ntc_${pin}.value * 3.3 / 65535\n` +
+    `    if _v <= 0 or _v >= 3.29: return 0\n` +
+    `    _r = (_v / 3.3 * 10000) / (1 - _v / 3.3)\n` +
+    `    return round(1 / (1 / 298.15 + 1 / 3950 * math.log(_r / 10000)) - 273.15, 1)`;
+  return [`_ntc_${pin}()`, Blockly.Python.ORDER_FUNCTION_CALL];
+};
+
+Blockly.Python['sensor_lux'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  _defs['import_board']    = 'import board';
+  _defs['import_analogio'] = 'import analogio';
+  _defs['import_math']     = 'import math';
+  _defs[`init_ain_lux_${pin}`] = `_ain_lux_${pin} = analogio.AnalogIn(board.${pin})`;
+  _defs[`fn_lux_${pin}`] =
+    `def _lux_${pin}():\n` +
+    `    _u2 = _ain_lux_${pin}.value * 3.3 / 65535\n` +
+    `    if _u2 <= 0: return 0\n` +
+    `    _r1 = (5 * 10000) / _u2\n` +
+    `    _i = (5 / _r1) * 1000000\n` +
+    `    return round(math.log(_i) / 0.06, 1)`;
+  return [`_lux_${pin}()`, Blockly.Python.ORDER_FUNCTION_CALL];
+};
+
+// ── Joystick-Generatoren (KY-023) ─────────────────────────────────────────────
+
+Blockly.Python['sensor_joystick_x'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  _defs['import_board']    = 'import board';
+  _defs['import_analogio'] = 'import analogio';
+  _defs[`init_joy_x_${pin}`] = `_joy_x_${pin} = analogio.AnalogIn(board.${pin})`;
+  return [`round(_joy_x_${pin}.value / 65535 * 100)`, Blockly.Python.ORDER_FUNCTION_CALL];
+};
+
+Blockly.Python['sensor_joystick_y'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  _defs['import_board']    = 'import board';
+  _defs['import_analogio'] = 'import analogio';
+  _defs[`init_joy_y_${pin}`] = `_joy_y_${pin} = analogio.AnalogIn(board.${pin})`;
+  return [`round(_joy_y_${pin}.value / 65535 * 100)`, Blockly.Python.ORDER_FUNCTION_CALL];
+};
+
+Blockly.Python['sensor_joystick_btn'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  _digitalInDef(pin, 'joy_btn', 'UP');
+  return [`(not _joy_btn_${pin}.value)`, Blockly.Python.ORDER_NONE];
+};
+
+// ── DHT11-Generatoren (KY-015) ────────────────────────────────────────────────
+
+Blockly.Python['sensor_dht11_temperature'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  _defs['import_board'] = 'import board';
+  _defs['import_dht']   = 'import adafruit_dht';
+  _defs[`init_dht11_${pin}`] = `_dht11_${pin} = adafruit_dht.DHT11(board.${pin})`;
+  return [`_dht11_${pin}.temperature`, Blockly.Python.ORDER_MEMBER];
+};
+
+Blockly.Python['sensor_dht11_humidity'] = function(block) {
+  const pin = block.getFieldValue('PIN');
+  _defs['import_board'] = 'import board';
+  _defs['import_dht']   = 'import adafruit_dht';
+  _defs[`init_dht11_${pin}`] = `_dht11_${pin} = adafruit_dht.DHT11(board.${pin})`;
+  return [`_dht11_${pin}.humidity`, Blockly.Python.ORDER_MEMBER];
+};
+
+// ── BMP280-Generatoren (KY-052) ───────────────────────────────────────────────
+
+function _bmp280Defs(sda, scl) {
+  _defs['import_board']  = 'import board';
+  _defs['import_busio']  = 'import busio';
+  _defs['import_bmp280'] = 'import adafruit_bmp280';
+  // I2C und Sensor in einem Eintrag, damit die Reihenfolge garantiert ist
+  _defs['init_bmp280'] =
+    `_i2c_bmp = busio.I2C(board.${scl}, board.${sda})\n` +
+    `_bmp280 = adafruit_bmp280.Adafruit_BMP280_I2C(_i2c_bmp)`;
+}
+
+Blockly.Python['sensor_bmp280_temp'] = function(block) {
+  _bmp280Defs(block.getFieldValue('SDA'), block.getFieldValue('SCL'));
+  return ['round(_bmp280.temperature, 1)', Blockly.Python.ORDER_FUNCTION_CALL];
+};
+
+Blockly.Python['sensor_bmp280_pressure'] = function(block) {
+  _bmp280Defs(block.getFieldValue('SDA'), block.getFieldValue('SCL'));
+  return ['round(_bmp280.pressure, 1)', Blockly.Python.ORDER_FUNCTION_CALL];
+};
+
+// ── Drehgeber-Generator (KY-040) ──────────────────────────────────────────────
+
+Blockly.Python['sensor_encoder'] = function(block) {
+  const pinA = block.getFieldValue('PIN_A');
+  const pinB = block.getFieldValue('PIN_B');
+  _defs['import_board']    = 'import board';
+  _defs['import_rotaryio'] = 'import rotaryio';
+  _defs[`init_enc_${pinA}_${pinB}`] =
+    `_enc_${pinA}_${pinB} = rotaryio.IncrementalEncoder(board.${pinA}, board.${pinB})`;
+  return [`_enc_${pinA}_${pinB}.position`, Blockly.Python.ORDER_MEMBER];
+};
+
+// ── Neue Ereignis-Generatoren ─────────────────────────────────────────────────
+
+Blockly.Python['event_obstacle'] = function(block) {
+  const pin  = block.getFieldValue('PIN');
+  const body = Blockly.Python.statementToCode(block, 'DO') || '    pass\n';
+  _digitalInDef(pin, 'obstacle', 'DOWN');
+  return `if not _obstacle_${pin}.value:\n${body}`;
+};
+
+Blockly.Python['event_flame'] = function(block) {
+  const pin  = block.getFieldValue('PIN');
+  const body = Blockly.Python.statementToCode(block, 'DO') || '    pass\n';
+  _digitalInDef(pin, 'flame', 'DOWN');
+  return `if not _flame_${pin}.value:\n${body}`;
+};
+
+Blockly.Python['event_sound'] = function(block) {
+  const pin  = block.getFieldValue('PIN');
+  const body = Blockly.Python.statementToCode(block, 'DO') || '    pass\n';
+  _digitalInDef(pin, 'sound', 'DOWN');
+  return `if not _sound_${pin}.value:\n${body}`;
+};
+
+Blockly.Python['event_tilt'] = function(block) {
+  const pin  = block.getFieldValue('PIN');
+  const body = Blockly.Python.statementToCode(block, 'DO') || '    pass\n';
+  _digitalInDef(pin, 'tilt', 'DOWN');
+  return `if not _tilt_${pin}.value:\n${body}`;
+};
+
+Blockly.Python['event_magnetic'] = function(block) {
+  const pin  = block.getFieldValue('PIN');
+  const body = Blockly.Python.statementToCode(block, 'DO') || '    pass\n';
+  _digitalInDef(pin, 'mag', 'DOWN');
+  return `if not _mag_${pin}.value:\n${body}`;
+};
+
+Blockly.Python['event_line'] = function(block) {
+  const pin  = block.getFieldValue('PIN');
+  const body = Blockly.Python.statementToCode(block, 'DO') || '    pass\n';
+  _digitalInDef(pin, 'line', 'DOWN');
+  return `if _line_${pin}.value:\n${body}`;
+};
+
+// ── Neue Aktor-Generatoren ────────────────────────────────────────────────────
+
+const _RGB_COLORS = {
+  red:    [true,  false, false],
+  green:  [false, true,  false],
+  blue:   [false, false, true ],
+  yellow: [true,  true,  false],
+  cyan:   [false, true,  true ],
+  pink:   [true,  false, true ],
+  white:  [true,  true,  true ],
+  off:    [false, false, false],
+};
+
+Blockly.Python['actuator_rgb_led'] = function(block) {
+  const pinR  = block.getFieldValue('PIN_R');
+  const pinG  = block.getFieldValue('PIN_G');
+  const pinB  = block.getFieldValue('PIN_B');
+  const color = block.getFieldValue('COLOR');
+  _digitalOutDef(pinR, 'rgbr');
+  _digitalOutDef(pinG, 'rgbg');
+  _digitalOutDef(pinB, 'rgbb');
+  const [r, g, b] = _RGB_COLORS[color];
+  return (
+    `_rgbr_${pinR}.value = ${r}\n` +
+    `_rgbg_${pinG}.value = ${g}\n` +
+    `_rgbb_${pinB}.value = ${b}\n`
+  );
+};
+
+const _2C_COLORS = {
+  red:    [true,  false],
+  green:  [false, true ],
+  yellow: [true,  true ],
+  off:    [false, false],
+};
+
+Blockly.Python['actuator_2color_led'] = function(block) {
+  const pinR  = block.getFieldValue('PIN_R');
+  const pinG  = block.getFieldValue('PIN_G');
+  const color = block.getFieldValue('COLOR');
+  _digitalOutDef(pinR, 'tc_r');
+  _digitalOutDef(pinG, 'tc_g');
+  const [r, g] = _2C_COLORS[color];
+  return (
+    `_tc_r_${pinR}.value = ${r}\n` +
+    `_tc_g_${pinG}.value = ${g}\n`
+  );
+};
+
+Blockly.Python['actuator_relay'] = function(block) {
+  const pin   = block.getFieldValue('PIN');
+  const state = block.getFieldValue('STATE');
+  _digitalOutDef(pin, 'relay');
+  return `_relay_${pin}.value = ${state}\n`;
+};
+
+Blockly.Python['actuator_active_buzzer'] = function(block) {
+  const pin   = block.getFieldValue('PIN');
+  const state = block.getFieldValue('STATE');
+  _digitalOutDef(pin, 'abuzz');
+  return `_abuzz_${pin}.value = ${state}\n`;
+};

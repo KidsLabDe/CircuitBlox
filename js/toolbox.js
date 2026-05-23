@@ -24,14 +24,38 @@ const TOOLBOX = {
       name: '🔵 Sensoren',
       colour: '#1565C0',
       contents: [
-        // Wert-Blöcke
-        { kind: 'label', text: '── Messwerte ──' },
+        // ── Bestehende Sensoren ──
+        { kind: 'label', text: '── Temperatur & Feuchte ──' },
         { kind: 'block', type: 'sensor_dht_temperature' },
         { kind: 'block', type: 'sensor_dht_humidity' },
+        { kind: 'block', type: 'sensor_dht11_temperature' },
+        { kind: 'block', type: 'sensor_dht11_humidity' },
+        { kind: 'label', text: '── Druck & I2C ──' },
+        { kind: 'block', type: 'sensor_bmp280_temp' },
+        { kind: 'block', type: 'sensor_bmp280_pressure' },
+        { kind: 'label', text: '── Abstand & Licht ──' },
         { kind: 'block', type: 'sensor_ultrasonic' },
         { kind: 'block', type: 'sensor_ldr' },
+        { kind: 'block', type: 'sensor_lux' },
+        { kind: 'label', text: '── Analog (universell) ──' },
+        { kind: 'block', type: 'sensor_analog_raw' },
+        { kind: 'block', type: 'sensor_ntc_temp' },
+        { kind: 'label', text: '── Digital-Sensoren ──' },
         { kind: 'block', type: 'sensor_button' },
-        // Ereignis-Blöcke
+        { kind: 'block', type: 'sensor_obstacle' },
+        { kind: 'block', type: 'sensor_line' },
+        { kind: 'block', type: 'sensor_tilt' },
+        { kind: 'block', type: 'sensor_magnetic' },
+        { kind: 'block', type: 'sensor_flame' },
+        { kind: 'block', type: 'sensor_sound' },
+        { kind: 'block', type: 'sensor_touch' },
+        { kind: 'block', type: 'sensor_vibration' },
+        { kind: 'label', text: '── Joystick & Encoder ──' },
+        { kind: 'block', type: 'sensor_joystick_x' },
+        { kind: 'block', type: 'sensor_joystick_y' },
+        { kind: 'block', type: 'sensor_joystick_btn' },
+        { kind: 'block', type: 'sensor_encoder' },
+        // ── Ereignis-Blöcke ──
         { kind: 'label', text: '── Ereignisse ──' },
         { kind: 'block', type: 'event_temperature',
           inputs: { VALUE: { shadow: { type: 'math_number', fields: { NUM: 25 } } } } },
@@ -40,6 +64,12 @@ const TOOLBOX = {
         { kind: 'block', type: 'event_ldr',
           inputs: { VALUE: { shadow: { type: 'math_number', fields: { NUM: 50 } } } } },
         { kind: 'block', type: 'event_button' },
+        { kind: 'block', type: 'event_obstacle' },
+        { kind: 'block', type: 'event_flame' },
+        { kind: 'block', type: 'event_sound' },
+        { kind: 'block', type: 'event_tilt' },
+        { kind: 'block', type: 'event_magnetic' },
+        { kind: 'block', type: 'event_line' },
       ]
     },
     {
@@ -47,6 +77,7 @@ const TOOLBOX = {
       name: '🟠 Aktoren',
       colour: '#E65100',
       contents: [
+        { kind: 'label', text: '── LED ──' },
         { kind: 'block', type: 'actuator_led' },
         { kind: 'block', type: 'actuator_led_blink',
           inputs: {
@@ -54,10 +85,12 @@ const TOOLBOX = {
             PAUSE: { shadow: { type: 'math_number', fields: { NUM: 0.5 } } }
           }
         },
-        { kind: 'sep' },
+        { kind: 'block', type: 'actuator_rgb_led' },
+        { kind: 'block', type: 'actuator_2color_led' },
+        { kind: 'label', text: '── Servo & Motor ──' },
         { kind: 'block', type: 'actuator_servo',
           inputs: { ANGLE: { shadow: { type: 'math_number', fields: { NUM: 90 } } } } },
-        { kind: 'sep' },
+        { kind: 'label', text: '── Ton ──' },
         { kind: 'block', type: 'actuator_buzzer',
           inputs: {
             FREQ:     { shadow: { type: 'math_number', fields: { NUM: 440 } } },
@@ -65,6 +98,9 @@ const TOOLBOX = {
           }
         },
         { kind: 'block', type: 'actuator_buzzer_off' },
+        { kind: 'block', type: 'actuator_active_buzzer' },
+        { kind: 'label', text: '── Weitere ──' },
+        { kind: 'block', type: 'actuator_relay' },
       ]
     },
     {

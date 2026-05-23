@@ -185,3 +185,95 @@ Blockly.Blocks['neopixel_off'] = {
     this.setTooltip('Schaltet alle NeoPixel-LEDs aus');
   }
 };
+
+// ── RGB-LED (KY-009, KY-016) ──────────────────────────────────────────────────
+
+const RGB_COLOR_OPTS = [
+  ['🔴 Rot',    'red'],
+  ['🟢 Grün',   'green'],
+  ['🔵 Blau',   'blue'],
+  ['🟡 Gelb',   'yellow'],
+  ['🩵 Türkis', 'cyan'],
+  ['🟣 Pink',   'pink'],
+  ['⬜ Weiß',   'white'],
+  ['⬛ Aus',    'off'],
+];
+
+Blockly.Blocks['actuator_rgb_led'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField('🌈 RGB-LED  R-Pin:')
+        .appendField(new Blockly.FieldDropdown(EXT_PIN_OPTS), 'PIN_R')
+        .appendField('G-Pin:')
+        .appendField(new Blockly.FieldDropdown(EXT_PIN_OPTS), 'PIN_G')
+        .appendField('B-Pin:')
+        .appendField(new Blockly.FieldDropdown(EXT_PIN_OPTS), 'PIN_B')
+        .appendField('Farbe:')
+        .appendField(new Blockly.FieldDropdown(RGB_COLOR_OPTS), 'COLOR');
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour('#E65100');
+    this.setTooltip('Setzt eine RGB-LED auf eine Farbe über drei digitale Ausgänge (KY-009, KY-016)');
+  }
+};
+
+// ── 2-Farben-LED (KY-011, KY-029) ────────────────────────────────────────────
+
+const TWOCOLOR_OPTS = [
+  ['🔴 Rot',  'red'],
+  ['🟢 Grün', 'green'],
+  ['🟡 Gelb', 'yellow'],
+  ['⬛ Aus',  'off'],
+];
+
+Blockly.Blocks['actuator_2color_led'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField('💡 2-Farben-LED  R-Pin:')
+        .appendField(new Blockly.FieldDropdown(EXT_PIN_OPTS), 'PIN_R')
+        .appendField('G-Pin:')
+        .appendField(new Blockly.FieldDropdown(EXT_PIN_OPTS), 'PIN_G')
+        .appendField('Farbe:')
+        .appendField(new Blockly.FieldDropdown(TWOCOLOR_OPTS), 'COLOR');
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour('#E65100');
+    this.setTooltip('Setzt eine 2-Farben-LED auf Rot, Grün, Gelb oder Aus (KY-011, KY-029)');
+  }
+};
+
+// ── Relais (KY-019) ───────────────────────────────────────────────────────────
+
+Blockly.Blocks['actuator_relay'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField('⚡ Relais  Pin:')
+        .appendField(new Blockly.FieldDropdown(EXT_PIN_OPTS), 'PIN')
+        .appendField(new Blockly.FieldDropdown([
+          ['einschalten', 'True'],
+          ['ausschalten', 'False']
+        ]), 'STATE');
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour('#E65100');
+    this.setTooltip('Schaltet ein Relais ein oder aus (KY-019)');
+  }
+};
+
+// ── Aktiver Summer (KY-012) ───────────────────────────────────────────────────
+
+Blockly.Blocks['actuator_active_buzzer'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField('🔔 Aktiver Summer  Pin:')
+        .appendField(new Blockly.FieldDropdown(EXT_PIN_OPTS), 'PIN')
+        .appendField(new Blockly.FieldDropdown([
+          ['einschalten', 'True'],
+          ['ausschalten', 'False']
+        ]), 'STATE');
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour('#E65100');
+    this.setTooltip('Schaltet einen aktiven Summer (Piezo mit fester Frequenz) ein oder aus (KY-012)');
+  }
+};
