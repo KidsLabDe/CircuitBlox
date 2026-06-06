@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CircuitBlox – Bauteil-Katalog</title>
+  <style>
+    :root {
+      --bg:      #1e1e2e;
+      --panel:   #252538;
+      --panel2:  #1a1a2e;
+      --border:  #3a3a5c;
+      --text:    #e0e0e0;
+      --muted:   #888;
+      --accent:  #7c6af7;
+      --success: #4caf50;
+      --warn:    #ff9800;
+      --font-mono: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: var(--panel);
+      border-bottom: 2px solid var(--accent);
+      flex-shrink: 0;
+    }
+    header h1 { font-size: 18px; font-weight: 700; color: var(--accent); }
+    header .sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    header .count { margin-left: auto; font-size: 12px; color: var(--muted); }
+
+    /* ── Main ── */
+    #main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    #sidebar {
+      width: 260px;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    #search-wrap {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    #search {
+      width: 100%;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--text);
+      font-size: 13px;
+      padding: 5px 9px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    #search:focus { border-color: var(--accent); }
+
+    #tree {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 0 12px;
+    }
+
+    .cat-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px 5px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      cursor: pointer;
+      user-select: none;
+      border-left: 3px solid transparent;
+      transition: background .15s;
+    }
+    .cat-header:hover { background: rgba(255,255,255,.05); }
+    .cat-arrow { font-size: 10px; color: var(--muted); transition: transform .2s; }
+    .cat-header.collapsed .cat-arrow { transform: rotate(-90deg); }
+    .cat-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .cat-body { overflow: hidden; }
+    .cat-body.collapsed { display: none; }
+
+    .subcat-label {
+      padding: 4px 10px 2px 24px;
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .block-item {
+      padding: 4px 10px 4px 28px;
+      font-size: 13px;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: background .12s;
+    }
+    .block-item:hover { background: rgba(124,106,247,.12); }
+    .block-item.active {
+      background: rgba(124,106,247,.22);
+      border-left-color: var(--accent);
+    }
+
+    /* ── Detail Panel ── */
+    #detail {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px;
+    }
+
+    #placeholder {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--muted);
+    }
+    #placeholder .icon { font-size: 48px; }
+    #placeholder p { font-size: 14px; }
+
+    #card { display: none; }
+
+    .card-header {
+      border-left: 5px solid var(--accent);
+      padding: 10px 14px;
+      background: var(--panel);
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 20px;
+    }
+    .card-label {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .card-id {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      margin-top: 4px;
+    }
+
+    .section {
+      margin-bottom: 18px;
+    }
+    .section-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .section-body {
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .chip {
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .chip.green { background: rgba(76,175,80,.15); border-color: #4caf50; color: #81c784; }
+    .chip.orange { background: rgba(255,152,0,.12); border-color: var(--warn); color: #ffb74d; }
+    .chip.blue { background: rgba(124,106,247,.15); border-color: var(--accent); color: #b0a4ff; }
+
+    .hw-grid {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 4px 14px;
+      font-size: 13px;
+    }
+    .hw-key { color: var(--muted); }
+    .hw-val { font-weight: 600; }
+    .kit-yes { color: #81c784; }
+    .kit-no  { color: var(--muted); }
+
+    .input-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .input-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .input-name {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--accent);
+      min-width: 60px;
+    }
+    .input-type { color: var(--muted); font-size: 12px; }
+
+    pre.imports {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.6;
+      color: #a5d6a7;
+      overflow-x: auto;
+    }
+
+    .legacy-note {
+      background: rgba(255,152,0,.1);
+      border: 1px solid var(--warn);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #ffb74d;
+    }
+
+    /* ── Scrollbars ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+  </style>
+</head>
+<body>
+
+<header>
+  <span style="font-size:26px">⚡</span>
+  <div>
+    <h1>Bauteil-Katalog</h1>
+    <div class="sub">CircuitBlox – MakeYourSchool</div>
+  </div>
+  <div class="count" id="count-label"></div>
+</header>
+
+<div id="main">
+
+  <!-- ── Sidebar ── -->
+  <div id="sidebar">
+    <div id="search-wrap">
+      <input id="search" type="search" placeholder="🔍  Suchen…" autocomplete="off">
+    </div>
+    <div id="tree"></div>
+  </div>
+
+  <!-- ── Detail ── -->
+  <div id="detail">
+    <div id="placeholder">
+      <div class="icon">📦</div>
+      <p>← Bauteil in der Liste auswählen</p>
+    </div>
+
+    <div id="card">
+      <div class="card-header" id="card-header">
+        <div class="card-label" id="card-label"></div>
+        <div class="card-id"   id="card-id"></div>
+      </div>
+
+      <div class="section" id="sec-desc">
+        <div class="section-title">Beschreibung</div>
+        <div class="section-body" id="card-tooltip"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Eigenschaften</div>
+        <div class="chips" id="card-chips"></div>
+      </div>
+
+      <div class="section" id="sec-hw">
+        <div class="section-title">Hardware</div>
+        <div class="hw-grid" id="card-hw"></div>
+      </div>
+
+      <div class="section" id="sec-inputs">
+        <div class="section-title">Pin-Eingaben</div>
+        <div class="input-list" id="card-inputs"></div>
+      </div>
+
+      <div class="section" id="sec-imports">
+        <div class="section-title">Code-Imports</div>
+        <pre class="imports" id="card-imports"></pre>
+      </div>
+
+      <div class="section" id="sec-legacy">
+        <div class="legacy-note">
+          ⚙️ Komplexer Block – Code-Generator ist in <code>js/generator.js</code> implementiert.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/boards.js"></script>
+<script src="js/blocks_db.js"></script>
+<script>
+  // ── Hilfsfunktionen ───────────────────────────────────────────────────────
+
+  const BLOCKTYPE_LABELS = {
+    value:        'Wert-Block (gibt Zahl/Wahrheitswert zurück)',
+    statement:    'Anweisungs-Block (führt Aktion aus)',
+    event_simple: 'Ereignis-Block (reagiert auf Bedingung)',
+    event:        'Ereignis-Block (reagiert auf Bedingung)',
+  };
+
+  const FIELDTYPE_LABELS = {
+    pin_dropdown:    'Pin-Auswahl',
+    on_off_dropdown: 'Ein / Aus',
+    op_dropdown:     'Vergleich (<, >, =)',
+    number_field:    'Zahl',
+    colour_picker:   'Farbe',
+    button_dropdown: 'Taster-Auswahl',
+    motor_dropdown:  'Motor-Auswahl',
+    servo_dropdown:  'Servo-Auswahl',
+    fixed_label:     'Text',
+  };
+
+  function hide(id) { document.getElementById(id).style.display = 'none'; }
+  function show(id, display) { document.getElementById(id).style.display = display || 'block'; }
+
+  // ── Baum rendern ──────────────────────────────────────────────────────────
+
+  let activeItem = null;
+
+  function buildTree(filter) {
+    const tree = document.getElementById('tree');
+    tree.innerHTML = '';
+
+    const q = (filter || '').toLowerCase();
+
+    let totalVisible = 0;
+
+    for (const catDef of BLOCKS_CATALOG.categories) {
+      const catBlocks = BLOCKS_DB.filter(b => {
+        if (b.blockCategory !== catDef.id) return false;
+        if (!q) return true;
+        return (b.label + ' ' + (b.tooltip || '') + ' ' + (b.hardware?.commonName || ''))
+          .toLowerCase().includes(q);
+      });
+
+      if (!catBlocks.length) continue;
+      totalVisible += catBlocks.length;
+
+      // Kategorie-Header
+      const hdr = document.createElement('div');
+      hdr.className = 'cat-header';
+      hdr.innerHTML = `
+        <span class="cat-arrow">▾</span>
+        <span class="cat-dot" style="background:${catDef.colour}"></span>
+        <span>${catDef.label}</span>`;
+      hdr.addEventListener('click', () => {
+        const body = hdr.nextElementSibling;
+        const collapsed = body.classList.toggle('collapsed');
+        hdr.classList.toggle('collapsed', collapsed);
+      });
+      tree.appendChild(hdr);
+
+      const body = document.createElement('div');
+      body.className = 'cat-body';
+
+      if (catDef.subCategories && catDef.subCategories.length) {
+        for (const sc of catDef.subCategories) {
+          const scBlocks = catBlocks.filter(b => b.subCategory === sc);
+          if (!scBlocks.length) continue;
+
+          const lbl = document.createElement('div');
+          lbl.className = 'subcat-label';
+          lbl.textContent = sc;
+          body.appendChild(lbl);
+
+          for (const def of scBlocks) body.appendChild(makeItem(def, catDef.colour));
+        }
+        const noSc = catBlocks.filter(
+          b => !b.subCategory || !catDef.subCategories.includes(b.subCategory)
+        );
+        for (const def of noSc) body.appendChild(makeItem(def, catDef.colour));
+      } else {
+        for (const def of catBlocks) body.appendChild(makeItem(def, catDef.colour));
+      }
+
+      tree.appendChild(body);
+    }
+
+    document.getElementById('count-label').textContent =
+      q ? `${totalVisible} Treffer` : `${BLOCKS_DB.length} Bauteile`;
+  }
+
+  function makeItem(def, colour) {
+    const el = document.createElement('div');
+    el.className = 'block-item';
+    el.textContent = def.label;
+    el.dataset.id  = def.id;
+    el.addEventListener('click', () => {
+      if (activeItem) activeItem.classList.remove('active');
+      el.classList.add('active');
+      activeItem = el;
+      showDetail(def, colour);
+    });
+    return el;
+  }
+
+  // ── Detail anzeigen ───────────────────────────────────────────────────────
+
+  function showDetail(def, colour) {
+    hide('placeholder');
+    show('card');
+
+    // Kopfzeile
+    document.getElementById('card-header').style.borderLeftColor = def.colour || colour || '#7c6af7';
+    document.getElementById('card-label').textContent = def.label;
+    document.getElementById('card-id').textContent    = def.id;
+
+    // Beschreibung
+    if (def.tooltip) {
+      document.getElementById('card-tooltip').textContent = def.tooltip;
+      show('sec-desc');
+    } else {
+      hide('sec-desc');
+    }
+
+    // Chips
+    const chips = document.getElementById('card-chips');
+    chips.innerHTML = '';
+    chips.appendChild(chip(BLOCKTYPE_LABELS[def.blockType] || def.blockType, 'blue'));
+    if (def.output)        chips.appendChild(chip('Ausgabe: ' + def.output, ''));
+    if (def.subCategory)   chips.appendChild(chip(def.subCategory, ''));
+
+    // Hardware
+    const hw = def.hardware;
+    if (hw && (hw.commonName || hw.kyNumber)) {
+      const grid = document.getElementById('card-hw');
+      grid.innerHTML = '';
+      if (hw.commonName)  addHwRow(grid, 'Name',       hw.commonName);
+      if (hw.kyNumber)    addHwRow(grid, 'KY/Joy-IT',  hw.kyNumber);
+      if (hw.verbrauch3j) addHwRow(grid, 'Verbrauch',  hw.verbrauch3j + '× (3 Jahre)');
+      addHwRow(grid, 'Kit-Standard',
+        hw.kitStandard
+          ? '<span class="kit-yes">✓ enthalten</span>'
+          : '<span class="kit-no">– auf Anfrage</span>',
+        true);
+      show('sec-hw');
+    } else {
+      hide('sec-hw');
+    }
+
+    // Pin-Eingaben
+    const realInputs = (def.inputs || []).filter(i => i.fieldType && i.fieldType !== 'fixed_label');
+    if (realInputs.length) {
+      const list = document.getElementById('card-inputs');
+      list.innerHTML = '';
+      for (const inp of realInputs) {
+        const row = document.createElement('div');
+        row.className = 'input-row';
+        row.innerHTML = `
+          <span class="input-name">${inp.name || ''}</span>
+          <span class="input-type">${FIELDTYPE_LABELS[inp.fieldType] || inp.fieldType}</span>
+          ${inp.label ? '<span style="color:var(--muted);font-size:12px">— ' + inp.label + '</span>' : ''}`;
+        list.appendChild(row);
+      }
+      show('sec-inputs');
+    } else {
+      hide('sec-inputs');
+    }
+
+    // Imports / Legacy
+    if (def.legacyGenerator) {
+      hide('sec-imports');
+      show('sec-legacy');
+    } else if (def.generator?.imports?.length) {
+      document.getElementById('card-imports').textContent =
+        def.generator.imports.join('\n');
+      show('sec-imports');
+      hide('sec-legacy');
+    } else {
+      hide('sec-imports');
+      hide('sec-legacy');
+    }
+  }
+
+  function chip(text, cls) {
+    const el = document.createElement('span');
+    el.className = 'chip' + (cls ? ' ' + cls : '');
+    el.textContent = text;
+    return el;
+  }
+
+  function addHwRow(grid, key, val, isHtml) {
+    const k = document.createElement('div');
+    k.className = 'hw-key';
+    k.textContent = key;
+    const v = document.createElement('div');
+    v.className = 'hw-val';
+    if (isHtml) v.innerHTML = val; else v.textContent = val;
+    grid.append(k, v);
+  }
+
+  // ── Suche ─────────────────────────────────────────────────────────────────
+
+  document.getElementById('search').addEventListener('input', function () {
+    buildTree(this.value);
+    // aktive Auswahl aufheben wenn gefiltert
+    activeItem = null;
+    hide('card');
+    show('placeholder');
+  });
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+
+  buildTree('');
+</script>
+
+</body>
+</html>
