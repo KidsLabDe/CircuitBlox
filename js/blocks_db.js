@@ -1,6 +1,6 @@
 // js/blocks_db.js – GENERIERT von scripts/build_blocks.js
 // Nicht manuell bearbeiten! Neu generieren: node scripts/build_blocks.js
-// Generiert: 2026-06-06T20:17:16.373Z
+// Generiert: 2026-06-06T21:02:46.794Z
 
 const BLOCKS_CATALOG = {
   "categories": [
@@ -44,85 +44,6 @@ const BLOCKS_CATALOG = {
 };
 
 const BLOCKS_DB = [
-  {
-    "id": "sensor_dht_humidity",
-    "blockCategory": "Sensoren",
-    "subCategory": "Temperatur & Feuchte",
-    "label": "💧 Luftfeuchte (%)",
-    "colour": "#1565C0",
-    "tooltip": "Liest die Luftfeuchtigkeit in % vom DHT22 Sensor",
-    "blockType": "value",
-    "output": "Number",
-    "inputs": [
-      {
-        "label": "💧 Luftfeuchte (%)  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "generator": {
-      "imports": [
-        "import board",
-        "import adafruit_dht"
-      ],
-      "defs": [
-        {
-          "key": "init_dht_${PIN}",
-          "val": "_dht_${PIN} = adafruit_dht.DHT22(board.${PIN})"
-        }
-      ],
-      "expression": "_dht_${PIN}.humidity",
-      "order": "MEMBER"
-    },
-    "hardware": {
-      "commonName": "DHT22",
-      "verbrauch3j": 5,
-      "kitStandard": true
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/dht_humidity.md"
-  },
-  {
-    "id": "sensor_dht_temperature",
-    "blockCategory": "Sensoren",
-    "subCategory": "Temperatur & Feuchte",
-    "label": "🌡️ Temperatur (°C)",
-    "colour": "#1565C0",
-    "tooltip": "Liest die Temperatur in Grad Celsius vom DHT22 Sensor",
-    "blockType": "value",
-    "output": "Number",
-    "inputs": [
-      {
-        "label": "🌡️ Temperatur (°C)  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "generator": {
-      "imports": [
-        "import board",
-        "import adafruit_dht"
-      ],
-      "defs": [
-        {
-          "key": "init_dht_${PIN}",
-          "val": "_dht_${PIN} = adafruit_dht.DHT22(board.${PIN})"
-        }
-      ],
-      "expression": "_dht_${PIN}.temperature",
-      "order": "MEMBER"
-    },
-    "hardware": {
-      "kyNumber": "",
-      "commonName": "DHT22",
-      "verbrauch3j": 5,
-      "kitStandard": true
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/dht_temperature.md"
-  },
   {
     "id": "sensor_dht11_humidity",
     "blockCategory": "Sensoren",
@@ -204,100 +125,6 @@ const BLOCKS_DB = [
     "_file": "sensors/dht11_temperature.md"
   },
   {
-    "id": "sensor_bmp280_pressure",
-    "blockCategory": "Sensoren",
-    "subCategory": "Druck & I2C",
-    "label": "🔵 BMP280 Luftdruck (hPa)",
-    "colour": "#1565C0",
-    "tooltip": "Liest den Luftdruck in hPa vom BMP280 über I2C. Benötigt Library: adafruit_bmp280 (KY-052)",
-    "blockType": "value",
-    "output": "Number",
-    "inputs": [
-      {
-        "label": "🔵 BMP280 Luftdruck (hPa)  SDA:",
-        "name": "SDA",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      },
-      {
-        "label": "SCL:",
-        "name": "SCL",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "generator": {
-      "imports": [
-        "import board",
-        "import busio",
-        "import adafruit_bmp280"
-      ],
-      "defs": [
-        {
-          "key": "init_bmp280",
-          "val": "_i2c_bmp = busio.I2C(board.${SCL}, board.${SDA})\n_bmp280 = adafruit_bmp280.Adafruit_BMP280_I2C(_i2c_bmp)"
-        }
-      ],
-      "expression": "round(_bmp280.pressure, 1)",
-      "order": "FUNCTION_CALL"
-    },
-    "hardware": {
-      "kyNumber": "KY-052",
-      "commonName": "BMP280",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/bmp280_pressure.md"
-  },
-  {
-    "id": "sensor_bmp280_temp",
-    "blockCategory": "Sensoren",
-    "subCategory": "Druck & I2C",
-    "label": "🌡️ BMP280 Temperatur (°C)",
-    "colour": "#1565C0",
-    "tooltip": "Liest die Temperatur in °C vom BMP280 über I2C. Benötigt Library: adafruit_bmp280 (KY-052)",
-    "blockType": "value",
-    "output": "Number",
-    "inputs": [
-      {
-        "label": "🌡️ BMP280 Temperatur (°C)  SDA:",
-        "name": "SDA",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      },
-      {
-        "label": "SCL:",
-        "name": "SCL",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "generator": {
-      "imports": [
-        "import board",
-        "import busio",
-        "import adafruit_bmp280"
-      ],
-      "defs": [
-        {
-          "key": "init_bmp280",
-          "val": "_i2c_bmp = busio.I2C(board.${SCL}, board.${SDA})\n_bmp280 = adafruit_bmp280.Adafruit_BMP280_I2C(_i2c_bmp)"
-        }
-      ],
-      "expression": "round(_bmp280.temperature, 1)",
-      "order": "FUNCTION_CALL"
-    },
-    "hardware": {
-      "kyNumber": "KY-052",
-      "commonName": "BMP280",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/bmp280_temp.md"
-  },
-  {
     "id": "sensor_ldr",
     "blockCategory": "Sensoren",
     "subCategory": "Abstand & Licht",
@@ -336,32 +163,6 @@ const BLOCKS_DB = [
     },
     "legacyGenerator": false,
     "_file": "sensors/ldr.md"
-  },
-  {
-    "id": "sensor_lux",
-    "blockCategory": "Sensoren",
-    "subCategory": "Abstand & Licht",
-    "label": "🔆 Helligkeit (Lux)",
-    "colour": "#1565C0",
-    "tooltip": "Liest die Beleuchtungsstärke in Lux vom Phototransistor (KY-054)",
-    "blockType": "value",
-    "output": "Number",
-    "inputs": [
-      {
-        "label": "🔆 Helligkeit (Lux)  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "hardware": {
-      "kyNumber": "KY-054",
-      "commonName": "Phototransistor",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": true,
-    "_file": "sensors/lux.md"
   },
   {
     "id": "sensor_ultrasonic",
@@ -409,45 +210,6 @@ const BLOCKS_DB = [
     "_file": "sensors/ultrasonic.md"
   },
   {
-    "id": "sensor_analog_raw",
-    "blockCategory": "Sensoren",
-    "subCategory": "Analog",
-    "label": "📊 Analogwert (0–100%)",
-    "colour": "#1565C0",
-    "tooltip": "Liest einen analogen Sensor aus (0–100 %). Für Mikrofon-Pegel, Helligkeit, Herzschlag u.v.m.",
-    "blockType": "value",
-    "output": "Number",
-    "inputs": [
-      {
-        "label": "📊 Analogwert (0–100%)  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "generator": {
-      "imports": [
-        "import board",
-        "import analogio"
-      ],
-      "defs": [
-        {
-          "key": "init_analog_${PIN}",
-          "val": "_analog_${PIN} = analogio.AnalogIn(board.${PIN})"
-        }
-      ],
-      "expression": "round(_analog_${PIN}.value / 65535 * 100)",
-      "order": "FUNCTION_CALL"
-    },
-    "hardware": {
-      "commonName": "Universeller Analogeingang",
-      "verbrauch3j": 0,
-      "kitStandard": true
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/analog_raw.md"
-  },
-  {
     "id": "sensor_bodenfeuchte",
     "blockCategory": "Sensoren",
     "subCategory": "Analog",
@@ -487,32 +249,6 @@ const BLOCKS_DB = [
     "_file": "sensors/bodenfeuchte.md"
   },
   {
-    "id": "sensor_ntc_temp",
-    "blockCategory": "Sensoren",
-    "subCategory": "Analog",
-    "label": "🌡️ NTC Temperatur (°C)",
-    "colour": "#1565C0",
-    "tooltip": "Liest die Temperatur in °C vom NTC-Thermistor (10 kΩ NTC + 10 kΩ Vorwiderstand, KY-013)",
-    "blockType": "value",
-    "output": "Number",
-    "inputs": [
-      {
-        "label": "🌡️ NTC Temperatur (°C)  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "hardware": {
-      "kyNumber": "KY-013",
-      "commonName": "NTC Thermistor",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": true,
-    "_file": "sensors/ntc_temp.md"
-  },
-  {
     "id": "sensor_button",
     "blockCategory": "Sensoren",
     "subCategory": "Digital-Sensoren",
@@ -528,166 +264,6 @@ const BLOCKS_DB = [
     },
     "legacyGenerator": true,
     "_file": "sensors/button.md"
-  },
-  {
-    "id": "sensor_flame",
-    "blockCategory": "Sensoren",
-    "subCategory": "Digital-Sensoren",
-    "label": "🔥 Flamme erkannt?",
-    "colour": "#1565C0",
-    "tooltip": "Gibt Wahr zurück, wenn der Flammensensor eine Flamme erkennt (KY-026)",
-    "blockType": "value",
-    "output": "Boolean",
-    "inputs": [
-      {
-        "label": "🔥 Flamme erkannt?  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "generator": {
-      "imports": [
-        "import board",
-        "import digitalio"
-      ],
-      "defs": [
-        {
-          "key": "init_flame_${PIN}",
-          "val": "_flame_${PIN} = digitalio.DigitalInOut(board.${PIN})\n_flame_${PIN}.switch_to_input(pull=digitalio.Pull.DOWN)"
-        }
-      ],
-      "expression": "(not _flame_${PIN}.value)",
-      "order": "NONE"
-    },
-    "hardware": {
-      "kyNumber": "KY-026",
-      "commonName": "Flammensensor",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/flame.md"
-  },
-  {
-    "id": "sensor_line",
-    "blockCategory": "Sensoren",
-    "subCategory": "Digital-Sensoren",
-    "label": "⊡ Linie erkannt?",
-    "colour": "#1565C0",
-    "tooltip": "Gibt Wahr zurück, wenn der Linien-Sensor eine dunkle Linie erkennt (KY-033)",
-    "blockType": "value",
-    "output": "Boolean",
-    "inputs": [
-      {
-        "label": "⊡ Linie erkannt?  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "generator": {
-      "imports": [
-        "import board",
-        "import digitalio"
-      ],
-      "defs": [
-        {
-          "key": "init_line_${PIN}",
-          "val": "_line_${PIN} = digitalio.DigitalInOut(board.${PIN})\n_line_${PIN}.switch_to_input(pull=digitalio.Pull.DOWN)"
-        }
-      ],
-      "expression": "_line_${PIN}.value",
-      "order": "MEMBER"
-    },
-    "hardware": {
-      "kyNumber": "KY-033",
-      "commonName": "Linienverfolgungssensor",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/line.md"
-  },
-  {
-    "id": "sensor_magnetic",
-    "blockCategory": "Sensoren",
-    "subCategory": "Digital-Sensoren",
-    "label": "🧲 Magnetfeld erkannt?",
-    "colour": "#1565C0",
-    "tooltip": "Gibt Wahr zurück, wenn ein Magnetfeld erkannt wird (KY-003, KY-021, KY-025)",
-    "blockType": "value",
-    "output": "Boolean",
-    "inputs": [
-      {
-        "label": "🧲 Magnetfeld erkannt?  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "generator": {
-      "imports": [
-        "import board",
-        "import digitalio"
-      ],
-      "defs": [
-        {
-          "key": "init_mag_${PIN}",
-          "val": "_mag_${PIN} = digitalio.DigitalInOut(board.${PIN})\n_mag_${PIN}.switch_to_input(pull=digitalio.Pull.DOWN)"
-        }
-      ],
-      "expression": "(not _mag_${PIN}.value)",
-      "order": "NONE"
-    },
-    "hardware": {
-      "kyNumber": "KY-003",
-      "commonName": "Hall-Sensor / Reedkontakt",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/magnetic.md"
-  },
-  {
-    "id": "sensor_obstacle",
-    "blockCategory": "Sensoren",
-    "subCategory": "Digital-Sensoren",
-    "label": "🚧 Hindernis erkannt?",
-    "colour": "#1565C0",
-    "tooltip": "Gibt Wahr zurück, wenn der Hindernis-Sensor ein Objekt erkennt (KY-032)",
-    "blockType": "value",
-    "output": "Boolean",
-    "inputs": [
-      {
-        "label": "🚧 Hindernis erkannt?  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "generator": {
-      "imports": [
-        "import board",
-        "import digitalio"
-      ],
-      "defs": [
-        {
-          "key": "init_obstacle_${PIN}",
-          "val": "_obstacle_${PIN} = digitalio.DigitalInOut(board.${PIN})\n_obstacle_${PIN}.switch_to_input(pull=digitalio.Pull.DOWN)"
-        }
-      ],
-      "expression": "(not _obstacle_${PIN}.value)",
-      "order": "NONE"
-    },
-    "hardware": {
-      "kyNumber": "KY-032",
-      "commonName": "IR-Hindernissensor",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/obstacle.md"
   },
   {
     "id": "sensor_pir",
@@ -809,46 +385,6 @@ const BLOCKS_DB = [
     "_file": "sensors/taster.md"
   },
   {
-    "id": "sensor_tilt",
-    "blockCategory": "Sensoren",
-    "subCategory": "Digital-Sensoren",
-    "label": "📐 Geneigt?",
-    "colour": "#1565C0",
-    "tooltip": "Gibt Wahr zurück, wenn der Neigungssensor geneigt ist (KY-017, KY-020)",
-    "blockType": "value",
-    "output": "Boolean",
-    "inputs": [
-      {
-        "label": "📐 Geneigt?  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "generator": {
-      "imports": [
-        "import board",
-        "import digitalio"
-      ],
-      "defs": [
-        {
-          "key": "init_tilt_${PIN}",
-          "val": "_tilt_${PIN} = digitalio.DigitalInOut(board.${PIN})\n_tilt_${PIN}.switch_to_input(pull=digitalio.Pull.DOWN)"
-        }
-      ],
-      "expression": "(not _tilt_${PIN}.value)",
-      "order": "NONE"
-    },
-    "hardware": {
-      "kyNumber": "KY-017",
-      "commonName": "Neigungssensor",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/tilt.md"
-  },
-  {
     "id": "sensor_touch",
     "blockCategory": "Sensoren",
     "subCategory": "Digital-Sensoren",
@@ -887,46 +423,6 @@ const BLOCKS_DB = [
     },
     "legacyGenerator": false,
     "_file": "sensors/touch.md"
-  },
-  {
-    "id": "sensor_vibration",
-    "blockCategory": "Sensoren",
-    "subCategory": "Digital-Sensoren",
-    "label": "💥 Erschütterung erkannt?",
-    "colour": "#1565C0",
-    "tooltip": "Gibt Wahr zurück, wenn der Vibrations- oder Klopfsensor ausgelöst wird (KY-002, KY-031)",
-    "blockType": "value",
-    "output": "Boolean",
-    "inputs": [
-      {
-        "label": "💥 Erschütterung erkannt?  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "generator": {
-      "imports": [
-        "import board",
-        "import digitalio"
-      ],
-      "defs": [
-        {
-          "key": "init_vib_${PIN}",
-          "val": "_vib_${PIN} = digitalio.DigitalInOut(board.${PIN})\n_vib_${PIN}.switch_to_input(pull=digitalio.Pull.DOWN)"
-        }
-      ],
-      "expression": "(not _vib_${PIN}.value)",
-      "order": "NONE"
-    },
-    "hardware": {
-      "kyNumber": "KY-002",
-      "commonName": "Vibrationssensor / Klopfsensor",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/vibration.md"
   },
   {
     "id": "sensor_encoder",
@@ -975,126 +471,6 @@ const BLOCKS_DB = [
     "_file": "sensors/encoder.md"
   },
   {
-    "id": "sensor_joystick_btn",
-    "blockCategory": "Sensoren",
-    "subCategory": "Joystick & Encoder",
-    "label": "🕹️ Joystick Taste gedrückt?",
-    "colour": "#1565C0",
-    "tooltip": "Gibt Wahr zurück, wenn die Joystick-Taste gedrückt wird (KY-023)",
-    "blockType": "value",
-    "output": "Boolean",
-    "inputs": [
-      {
-        "label": "🕹️ Joystick Taste gedrückt?  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "generator": {
-      "imports": [
-        "import board",
-        "import digitalio"
-      ],
-      "defs": [
-        {
-          "key": "init_joy_btn_${PIN}",
-          "val": "_joy_btn_${PIN} = digitalio.DigitalInOut(board.${PIN})\n_joy_btn_${PIN}.switch_to_input(pull=digitalio.Pull.UP)"
-        }
-      ],
-      "expression": "(not _joy_btn_${PIN}.value)",
-      "order": "NONE"
-    },
-    "hardware": {
-      "kyNumber": "KY-023",
-      "commonName": "Joystick-Taste",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/joystick_btn.md"
-  },
-  {
-    "id": "sensor_joystick_x",
-    "blockCategory": "Sensoren",
-    "subCategory": "Joystick & Encoder",
-    "label": "🕹️ Joystick X-Achse (0–100%)",
-    "colour": "#1565C0",
-    "tooltip": "Liest die X-Achse des Joysticks (0–100 %, analoger Eingang, KY-023)",
-    "blockType": "value",
-    "output": "Number",
-    "inputs": [
-      {
-        "label": "🕹️ Joystick X-Achse (0–100%)  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "generator": {
-      "imports": [
-        "import board",
-        "import analogio"
-      ],
-      "defs": [
-        {
-          "key": "init_joy_x_${PIN}",
-          "val": "_joy_x_${PIN} = analogio.AnalogIn(board.${PIN})"
-        }
-      ],
-      "expression": "round(_joy_x_${PIN}.value / 65535 * 100)",
-      "order": "FUNCTION_CALL"
-    },
-    "hardware": {
-      "kyNumber": "KY-023",
-      "commonName": "Joystick",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/joystick_x.md"
-  },
-  {
-    "id": "sensor_joystick_y",
-    "blockCategory": "Sensoren",
-    "subCategory": "Joystick & Encoder",
-    "label": "🕹️ Joystick Y-Achse (0–100%)",
-    "colour": "#1565C0",
-    "tooltip": "Liest die Y-Achse des Joysticks (0–100 %, analoger Eingang, KY-023)",
-    "blockType": "value",
-    "output": "Number",
-    "inputs": [
-      {
-        "label": "🕹️ Joystick Y-Achse (0–100%)  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "generator": {
-      "imports": [
-        "import board",
-        "import analogio"
-      ],
-      "defs": [
-        {
-          "key": "init_joy_y_${PIN}",
-          "val": "_joy_y_${PIN} = analogio.AnalogIn(board.${PIN})"
-        }
-      ],
-      "expression": "round(_joy_y_${PIN}.value / 65535 * 100)",
-      "order": "FUNCTION_CALL"
-    },
-    "hardware": {
-      "kyNumber": "KY-023",
-      "commonName": "Joystick",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/joystick_y.md"
-  },
-  {
     "id": "event_button",
     "blockCategory": "Sensoren",
     "subCategory": "Ereignisse",
@@ -1109,48 +485,6 @@ const BLOCKS_DB = [
     },
     "legacyGenerator": true,
     "_file": "sensors/event_button.md"
-  },
-  {
-    "id": "event_flame",
-    "blockCategory": "Sensoren",
-    "subCategory": "Ereignisse",
-    "label": "🔥 Wenn Flamme erkannt",
-    "colour": "#0D47A1",
-    "tooltip": "Führt Code aus, wenn der Flammensensor eine Flamme erkennt (KY-026)",
-    "blockType": "event_simple",
-    "inputs": [
-      {
-        "label": "🔥 Wenn Flamme erkannt  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "statementInput": {
-      "name": "DO",
-      "label": "→ dann"
-    },
-    "generator": {
-      "imports": [
-        "import board",
-        "import digitalio"
-      ],
-      "defs": [
-        {
-          "key": "init_flame_${PIN}",
-          "val": "_flame_${PIN} = digitalio.DigitalInOut(board.${PIN})\n_flame_${PIN}.switch_to_input(pull=digitalio.Pull.DOWN)"
-        }
-      ],
-      "code": "if not _flame_${PIN}.value:\n${DO}"
-    },
-    "hardware": {
-      "kyNumber": "KY-026",
-      "commonName": "Flammensensor",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/event_flame.md"
   },
   {
     "id": "event_ldr",
@@ -1209,132 +543,6 @@ const BLOCKS_DB = [
     },
     "legacyGenerator": false,
     "_file": "sensors/event_ldr.md"
-  },
-  {
-    "id": "event_line",
-    "blockCategory": "Sensoren",
-    "subCategory": "Ereignisse",
-    "label": "⊡ Wenn Linie erkannt",
-    "colour": "#0D47A1",
-    "tooltip": "Führt Code aus, wenn der Linien-Sensor eine dunkle Linie erkennt",
-    "blockType": "event_simple",
-    "inputs": [
-      {
-        "label": "⊡ Wenn Linie erkannt  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "statementInput": {
-      "name": "DO",
-      "label": "→ dann"
-    },
-    "generator": {
-      "imports": [
-        "import board",
-        "import digitalio"
-      ],
-      "defs": [
-        {
-          "key": "init_line_${PIN}",
-          "val": "_line_${PIN} = digitalio.DigitalInOut(board.${PIN})\n_line_${PIN}.switch_to_input(pull=digitalio.Pull.DOWN)"
-        }
-      ],
-      "code": "if _line_${PIN}.value:\n${DO}"
-    },
-    "hardware": {
-      "kyNumber": "KY-033",
-      "commonName": "Liniensensor",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/event_line.md"
-  },
-  {
-    "id": "event_magnetic",
-    "blockCategory": "Sensoren",
-    "subCategory": "Ereignisse",
-    "label": "🧲 Wenn Magnetfeld erkannt",
-    "colour": "#0D47A1",
-    "tooltip": "Führt Code aus, wenn ein Magnetfeld erkannt wird",
-    "blockType": "event_simple",
-    "inputs": [
-      {
-        "label": "🧲 Wenn Magnetfeld erkannt  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "statementInput": {
-      "name": "DO",
-      "label": "→ dann"
-    },
-    "generator": {
-      "imports": [
-        "import board",
-        "import digitalio"
-      ],
-      "defs": [
-        {
-          "key": "init_mag_${PIN}",
-          "val": "_mag_${PIN} = digitalio.DigitalInOut(board.${PIN})\n_mag_${PIN}.switch_to_input(pull=digitalio.Pull.DOWN)"
-        }
-      ],
-      "code": "if not _mag_${PIN}.value:\n${DO}"
-    },
-    "hardware": {
-      "kyNumber": "KY-003",
-      "commonName": "Hall-Sensor",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/event_magnetic.md"
-  },
-  {
-    "id": "event_obstacle",
-    "blockCategory": "Sensoren",
-    "subCategory": "Ereignisse",
-    "label": "🚧 Wenn Hindernis erkannt",
-    "colour": "#0D47A1",
-    "tooltip": "Führt Code aus, wenn der Hindernis-Sensor ein Objekt erkennt (KY-032)",
-    "blockType": "event_simple",
-    "inputs": [
-      {
-        "label": "🚧 Wenn Hindernis erkannt  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "statementInput": {
-      "name": "DO",
-      "label": "→ dann"
-    },
-    "generator": {
-      "imports": [
-        "import board",
-        "import digitalio"
-      ],
-      "defs": [
-        {
-          "key": "init_obstacle_${PIN}",
-          "val": "_obstacle_${PIN} = digitalio.DigitalInOut(board.${PIN})\n_obstacle_${PIN}.switch_to_input(pull=digitalio.Pull.DOWN)"
-        }
-      ],
-      "code": "if not _obstacle_${PIN}.value:\n${DO}"
-    },
-    "hardware": {
-      "kyNumber": "KY-032",
-      "commonName": "IR-Hindernissensor",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/event_obstacle.md"
   },
   {
     "id": "event_sound",
@@ -1432,48 +640,6 @@ const BLOCKS_DB = [
     "_file": "sensors/event_temperature.md"
   },
   {
-    "id": "event_tilt",
-    "blockCategory": "Sensoren",
-    "subCategory": "Ereignisse",
-    "label": "📐 Wenn geneigt",
-    "colour": "#0D47A1",
-    "tooltip": "Führt Code aus, wenn der Neigungssensor geneigt ist",
-    "blockType": "event_simple",
-    "inputs": [
-      {
-        "label": "📐 Wenn geneigt  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      }
-    ],
-    "statementInput": {
-      "name": "DO",
-      "label": "→ dann"
-    },
-    "generator": {
-      "imports": [
-        "import board",
-        "import digitalio"
-      ],
-      "defs": [
-        {
-          "key": "init_tilt_${PIN}",
-          "val": "_tilt_${PIN} = digitalio.DigitalInOut(board.${PIN})\n_tilt_${PIN}.switch_to_input(pull=digitalio.Pull.DOWN)"
-        }
-      ],
-      "code": "if not _tilt_${PIN}.value:\n${DO}"
-    },
-    "hardware": {
-      "kyNumber": "KY-017",
-      "commonName": "Neigungssensor",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "sensors/event_tilt.md"
-  },
-  {
     "id": "event_ultrasonic",
     "blockCategory": "Sensoren",
     "subCategory": "Ereignisse",
@@ -1535,23 +701,6 @@ const BLOCKS_DB = [
     },
     "legacyGenerator": false,
     "_file": "sensors/event_ultrasonic.md"
-  },
-  {
-    "id": "actuator_2color_led",
-    "blockCategory": "Aktoren",
-    "subCategory": "LED",
-    "label": "💡 2-Farben-LED",
-    "colour": "#E65100",
-    "tooltip": "Setzt eine 2-Farben-LED auf Rot, Grün, Gelb oder Aus (KY-011, KY-029)",
-    "blockType": "statement",
-    "hardware": {
-      "kyNumber": "KY-011",
-      "commonName": "2-Farben-LED",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": true,
-    "_file": "actuators/twocolor_led.md"
   },
   {
     "id": "actuator_led",
@@ -1628,48 +777,6 @@ const BLOCKS_DB = [
     "_file": "actuators/rgb_led.md"
   },
   {
-    "id": "actuator_active_buzzer",
-    "blockCategory": "Aktoren",
-    "subCategory": "Ton",
-    "label": "🔔 Aktiver Summer",
-    "colour": "#E65100",
-    "tooltip": "Schaltet einen aktiven Summer (Piezo mit fester Frequenz) ein oder aus (KY-012)",
-    "blockType": "statement",
-    "inputs": [
-      {
-        "label": "🔔 Aktiver Summer  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      },
-      {
-        "name": "STATE",
-        "fieldType": "on_off_dropdown"
-      }
-    ],
-    "generator": {
-      "imports": [
-        "import board",
-        "import digitalio"
-      ],
-      "defs": [
-        {
-          "key": "init_abuzz_${PIN}",
-          "val": "_abuzz_${PIN} = digitalio.DigitalInOut(board.${PIN})\n_abuzz_${PIN}.direction = digitalio.Direction.OUTPUT"
-        }
-      ],
-      "code": "_abuzz_${PIN}.value = ${STATE}\n"
-    },
-    "hardware": {
-      "kyNumber": "KY-012",
-      "commonName": "Aktiver Summer / Buzzer",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "actuators/active_buzzer.md"
-  },
-  {
     "id": "actuator_buzzer",
     "blockCategory": "Aktoren",
     "subCategory": "Ton",
@@ -1700,48 +807,6 @@ const BLOCKS_DB = [
     },
     "legacyGenerator": true,
     "_file": "actuators/buzzer_off.md"
-  },
-  {
-    "id": "actuator_relay",
-    "blockCategory": "Aktoren",
-    "subCategory": "Weitere",
-    "label": "⚡ Relais",
-    "colour": "#E65100",
-    "tooltip": "Schaltet ein Relais ein oder aus (KY-019)",
-    "blockType": "statement",
-    "inputs": [
-      {
-        "label": "⚡ Relais  Pin:",
-        "name": "PIN",
-        "fieldType": "pin_dropdown",
-        "pinSource": "externalPins"
-      },
-      {
-        "name": "STATE",
-        "fieldType": "on_off_dropdown"
-      }
-    ],
-    "generator": {
-      "imports": [
-        "import board",
-        "import digitalio"
-      ],
-      "defs": [
-        {
-          "key": "init_relay_${PIN}",
-          "val": "_relay_${PIN} = digitalio.DigitalInOut(board.${PIN})\n_relay_${PIN}.direction = digitalio.Direction.OUTPUT"
-        }
-      ],
-      "code": "_relay_${PIN}.value = ${STATE}\n"
-    },
-    "hardware": {
-      "kyNumber": "KY-019",
-      "commonName": "Relais-Modul",
-      "verbrauch3j": 0,
-      "kitStandard": false
-    },
-    "legacyGenerator": false,
-    "_file": "actuators/relay.md"
   },
   {
     "id": "actuator_servo",
