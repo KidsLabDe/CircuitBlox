@@ -69,12 +69,13 @@ const TOOLBOX_STATIC_CONTENTS = [
   },
 ];
 
-// Baut die vollständige Toolbox: Hardware-Kategorien (aus block_builder.js) + statische
+// Baut die vollständige Toolbox: KI-Blöcke + Hardware-Kategorien + statische
 function buildFinalToolbox() {
   return {
     kind: 'categoryToolbox',
     contents: [
-      ...(window.BLOCKS_DB_TOOLBOX || []),
+      ...(window.AI_BLOCKS_TOOLBOX  || []),
+      ...(window.BLOCKS_DB_TOOLBOX  || []),
       ...TOOLBOX_STATIC_CONTENTS,
     ]
   };
