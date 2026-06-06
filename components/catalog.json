@@ -1,0 +1,36 @@
+{
+  "categories": [
+    {
+      "id": "Sensoren",
+      "label": "🔵 Sensoren",
+      "colour": "#1565C0",
+      "subCategories": [
+        "Temperatur & Feuchte",
+        "Druck & I2C",
+        "Abstand & Licht",
+        "Analog",
+        "Digital-Sensoren",
+        "Joystick & Encoder",
+        "Ereignisse"
+      ]
+    },
+    {
+      "id": "Aktoren",
+      "label": "🟠 Aktoren",
+      "colour": "#E65100",
+      "subCategories": ["LED", "Ton", "Weitere"]
+    },
+    {
+      "id": "Motor",
+      "label": "🟣 Motor",
+      "colour": "#6A1B9A",
+      "subCategories": []
+    },
+    {
+      "id": "NeoPixel",
+      "label": "🌈 NeoPixel",
+      "colour": "#006064",
+      "subCategories": []
+    }
+  ]
+}

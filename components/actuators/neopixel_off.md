@@ -1,0 +1,16 @@
+---
+id: neopixel_off
+blockCategory: NeoPixel
+subCategory: ""
+label: "🌈 NeoPixel alle aus"
+colour: "#006064"
+tooltip: "Schaltet alle NeoPixel-LEDs aus"
+blockType: statement
+hardware:
+  commonName: "NeoPixel / WS2812B"
+  verbrauch3j: 0
+  kitStandard: true
+legacyGenerator: true
+---
+
+# NeoPixel alle LEDs ausschalten

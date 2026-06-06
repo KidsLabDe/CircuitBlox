@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CircuitBlox – Bauteil-Editor</title>
+  <style>
+    :root {
+      --bg:      #1e1e2e;
+      --panel:   #252538;
+      --border:  #3a3a5c;
+      --text:    #e0e0e0;
+      --muted:   #888;
+      --accent:  #7c6af7;
+      --success: #4caf50;
+      --warn:    #ff9800;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    header h1 { font-size: 16px; font-weight: 600; }
+    header .sub { font-size: 12px; color: var(--muted); }
+
+    .banner {
+      background: #2a2510;
+      border-bottom: 1px solid #554400;
+      padding: 6px 16px;
+      font-size: 12px;
+      color: var(--warn);
+      flex-shrink: 0;
+    }
+
+    #main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Seitenleiste ── */
+    #sidebar {
+      width: 240px;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    #sidebar-header {
+      padding: 10px 12px;
+      display: flex;
+      gap: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-secondary { background: var(--border); color: var(--text); }
+    .btn-secondary:hover { background: #4a4a6c; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-success:hover { opacity: 0.85; }
+    .btn-success:disabled { opacity: 0.4; cursor: default; }
+
+    #file-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 0;
+    }
+
+    .folder-label {
+      padding: 6px 12px 2px;
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .file-item {
+      padding: 5px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-item:hover { background: rgba(124,106,247,0.1); }
+    .file-item.active {
+      background: rgba(124,106,247,0.2);
+      border-left-color: var(--accent);
+    }
+
+    /* ── Editor ── */
+    #editor-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #editor-toolbar {
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+      flex-shrink: 0;
+    }
+
+    #current-file {
+      flex: 1;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    #current-file span {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    #editor {
+      flex: 1;
+      resize: none;
+      background: #12121e;
+      color: #cdd6f4;
+      border: none;
+      outline: none;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 16px;
+      tab-size: 2;
+    }
+
+    #status {
+      padding: 6px 16px;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    #status.ok    { color: var(--success); }
+    #status.error { color: #f44336; }
+
+    #drop-zone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 12px;
+      color: var(--muted);
+    }
+
+    #drop-zone .icon { font-size: 48px; }
+    #drop-zone p { font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <span style="font-size:24px">⚡</span>
+  <div>
+    <h1>Bauteil-Editor</h1>
+    <div class="sub">CircuitBlox – Markdown-Dateien bearbeiten</div>
+  </div>
+</header>
+
+<div class="banner">
+  💡 Nach dem Speichern: <code>node scripts/build_blocks.js</code> ausführen, damit Änderungen im Editor erscheinen.
+</div>
+
+<div id="main">
+
+  <!-- Seitenleiste -->
+  <div id="sidebar">
+    <div id="sidebar-header">
+      <button class="btn-primary" onclick="openFolder()" title="components/-Ordner öffnen">📂 Öffnen</button>
+      <button class="btn-secondary" onclick="newFile()" title="Neue Markdown-Datei anlegen">＋ Neu</button>
+    </div>
+    <div id="file-list">
+      <div style="padding: 20px 12px; font-size: 13px; color: var(--muted);">
+        Noch kein Ordner geöffnet.<br>Klicke auf <strong>📂 Öffnen</strong>.
+      </div>
+    </div>
+  </div>
+
+  <!-- Editor -->
+  <div id="editor-area">
+    <div id="editor-toolbar">
+      <div id="current-file">Keine Datei ausgewählt</div>
+      <button class="btn-success" id="btn-save" onclick="saveFile()" disabled>💾 Speichern</button>
+    </div>
+
+    <div id="drop-zone">
+      <div class="icon">📄</div>
+      <p>Ordner öffnen und Datei auswählen</p>
+    </div>
+    <textarea id="editor" style="display:none" spellcheck="false"
+      oninput="markDirty()"></textarea>
+  </div>
+
+</div>
+
+<div id="status">Bereit</div>
+
+<script>
+  let dirHandle    = null;
+  let fileHandle   = null;
+  let dirty        = false;
+  const editor     = document.getElementById('editor');
+  const dropZone   = document.getElementById('drop-zone');
+  const btnSave    = document.getElementById('btn-save');
+  const statusEl   = document.getElementById('status');
+  const fileList   = document.getElementById('file-list');
+  const currentFileLbl = document.getElementById('current-file');
+
+  // ── Ordner öffnen ─────────────────────────────────────────────────────────
+
+  async function openFolder() {
+    try {
+      dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+      await renderFileList();
+      setStatus('Ordner geöffnet: ' + dirHandle.name, 'ok');
+    } catch (e) {
+      if (e.name !== 'AbortError') setStatus('Fehler: ' + e.message, 'error');
+    }
+  }
+
+  async function renderFileList() {
+    fileList.innerHTML = '';
+    const groups = {};
+    for await (const [name, handle] of dirHandle.entries()) {
+      if (handle.kind === 'directory') {
+        groups[name] = [];
+        for await (const [fn, fh] of handle.entries()) {
+          if (fn.endsWith('.md')) groups[name].push({ name: fn, handle: fh, dir: name });
+        }
+      } else if (name.endsWith('.md')) {
+        if (!groups['']) groups[''] = [];
+        groups[''].push({ name, handle, dir: '' });
+      }
+    }
+
+    // Sortierte Ausgabe
+    const order = ['', 'sensors', 'actuators'];
+    const allKeys = [...new Set([...order, ...Object.keys(groups)])];
+
+    for (const dir of allKeys) {
+      if (!(dir in groups) || !groups[dir].length) continue;
+      const label = document.createElement('div');
+      label.className = 'folder-label';
+      label.textContent = dir || dirHandle.name;
+      fileList.appendChild(label);
+
+      groups[dir].sort((a, b) => a.name.localeCompare(b.name));
+      for (const f of groups[dir]) {
+        const item = document.createElement('div');
+        item.className = 'file-item';
+        item.textContent = f.name;
+        item.title = (dir ? dir + '/' : '') + f.name;
+        item.onclick = () => openFile(f.handle, item, (dir ? dir + '/' : '') + f.name);
+        fileList.appendChild(item);
+      }
+    }
+  }
+
+  // ── Datei öffnen ──────────────────────────────────────────────────────────
+
+  async function openFile(handle, itemEl, displayPath) {
+    if (dirty && !confirm('Änderungen verwerfen?')) return;
+    fileHandle = handle;
+    const file = await handle.getFile();
+    const text = await file.text();
+    showEditor(text, displayPath);
+    document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
+    itemEl.classList.add('active');
+  }
+
+  function showEditor(text, name) {
+    dropZone.style.display = 'none';
+    editor.style.display = 'block';
+    editor.value = text;
+    currentFileLbl.innerHTML = 'Datei: <span>' + (name || fileHandle?.name || '') + '</span>';
+    dirty = false;
+    btnSave.disabled = false;
+    setStatus('Geladen', 'ok');
+  }
+
+  // ── Speichern ─────────────────────────────────────────────────────────────
+
+  async function saveFile() {
+    if (!fileHandle) return;
+    try {
+      const writable = await fileHandle.createWritable();
+      await writable.write(editor.value);
+      await writable.close();
+      dirty = false;
+      setStatus('✅ Gespeichert – jetzt node scripts/build_blocks.js ausführen!', 'ok');
+    } catch (e) {
+      setStatus('Fehler beim Speichern: ' + e.message, 'error');
+    }
+  }
+
+  // ── Neue Datei ────────────────────────────────────────────────────────────
+
+  async function newFile() {
+    if (!dirHandle) { alert('Zuerst Ordner öffnen!'); return; }
+    const name = prompt('Dateiname (z.B. sensors/mein_sensor.md):');
+    if (!name) return;
+
+    const parts = name.split('/');
+    let targetDir = dirHandle;
+    for (let i = 0; i < parts.length - 1; i++) {
+      targetDir = await targetDir.getDirectoryHandle(parts[i], { create: true });
+    }
+    const fileName = parts[parts.length - 1].endsWith('.md')
+      ? parts[parts.length - 1]
+      : parts[parts.length - 1] + '.md';
+
+    fileHandle = await targetDir.getFileHandle(fileName, { create: true });
+    const template = `---
+id: mein_sensor
+blockCategory: Sensoren
+subCategory: Digital-Sensoren
+label: "🔧 Mein Sensor"
+colour: "#1565C0"
+tooltip: "Beschreibung des Sensors"
+blockType: value
+output: Number
+inputs:
+  - label: "🔧 Mein Sensor  Pin:"
+    name: PIN
+    fieldType: pin_dropdown
+    pinSource: externalPins
+generator:
+  imports:
+    - "import board"
+    - "import digitalio"
+  defs:
+    - key: "init_mein_\${PIN}"
+      val: "_mein_\${PIN} = digitalio.DigitalInOut(board.\${PIN})"
+  expression: "_mein_\${PIN}.value"
+  order: MEMBER
+hardware:
+  commonName: "Mein Bauteil"
+  verbrauch3j: 0
+  kitStandard: false
+legacyGenerator: false
+---
+
+# Mein Sensor
+
+Beschreibung hier eintragen.
+`;
+    showEditor(template, name);
+    await saveFile();
+    await renderFileList();
+  }
+
+  // ── Dirty-State ───────────────────────────────────────────────────────────
+
+  function markDirty() {
+    if (!dirty) {
+      dirty = true;
+      setStatus('Ungespeicherte Änderungen …', '');
+    }
+  }
+
+  // ── Keyboard-Shortcut: Ctrl+S ─────────────────────────────────────────────
+
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      if (fileHandle) saveFile();
+    }
+  });
+
+  // ── Status ────────────────────────────────────────────────────────────────
+
+  function setStatus(msg, cls) {
+    statusEl.textContent = msg;
+    statusEl.className = cls || '';
+  }
+
+  // Feature-Check
+  if (!window.showDirectoryPicker) {
+    setStatus('⚠️ File System Access API nicht verfügbar – Chrome/Edge verwenden!', 'error');
+    document.querySelector('.btn-primary').disabled = true;
+  }
+</script>
+
+</body>
+</html>

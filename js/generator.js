@@ -3,8 +3,8 @@
 Blockly.Python.INDENT = '    ';
 
 // Modul-globale Sammel-Variablen (reset vor jeder Generierung)
-let _defs     = Object.create(null);  // imports + initialisierungen
-let _setupCode = '';                  // Code aus dem SETUP-Block
+var _defs     = Object.create(null);  // imports + initialisierungen (var = global für block_builder.js)
+var _setupCode = '';                  // Code aus dem SETUP-Block
 
 Blockly.Python.workspaceToCode = function(workspace) {
   _defs      = Object.create(null);

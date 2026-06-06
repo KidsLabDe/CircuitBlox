@@ -29,7 +29,7 @@ function initBlockly() {
   });
 
   workspace = Blockly.inject('blockly-workspace', {
-    toolbox: TOOLBOX,
+    toolbox: buildFinalToolbox(),
     renderer: 'zelos',
     theme: cbTheme,
     scrollbars: true,
