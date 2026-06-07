@@ -1,0 +1,7 @@
+{
+  "name": "circuitblox-build",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build_blocks.js"
+  }
+}

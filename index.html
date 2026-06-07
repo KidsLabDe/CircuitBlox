@@ -37,6 +37,7 @@
       <button id="btn-connect" class="btn btn-primary">Verbinden</button>
       <button id="btn-run"  class="btn btn-warning" disabled>▶ Ausführen</button>
       <button id="btn-stop" class="btn btn-danger"  disabled>⏹ Stopp</button>
+      <button onclick="aiOpen()" class="btn btn-ghost" title="KI-Block Generator öffnen">🤖 KI-Block</button>
     </div>
   </header>
 
@@ -90,14 +91,48 @@
   <!-- Toast -->
   <div id="toast" class="toast"></div>
 
+  <!-- KI-Block Drawer -->
+  <div id="ai-drawer">
+    <div class="panel-header">
+      <span>🤖 KI-Block Generator</span>
+      <div class="panel-actions">
+        <button onclick="aiClearChat()" class="btn-icon" title="Verlauf löschen">🗑️</button>
+        <button onclick="aiToggleSettings()" class="btn-icon" title="Einstellungen">⚙️</button>
+        <button onclick="aiClose()" class="btn-icon" title="Schließen">✕</button>
+      </div>
+    </div>
+
+    <!-- Einstellungen (eingeklappt) -->
+    <div id="ai-settings" style="display:none">
+      <label>API-Key (OpenRouter)</label>
+      <input id="ai-key-input" type="password" placeholder="sk-or-…">
+      <label>Modell</label>
+      <input id="ai-model-input" placeholder="google/gemma-3-27b-it">
+      <button id="ai-save-btn" onclick="aiSaveSettings()">Speichern</button>
+    </div>
+
+    <!-- Chat-Verlauf -->
+    <div id="ai-messages"></div>
+
+    <!-- Eingabe -->
+    <div id="ai-input-row">
+      <textarea id="ai-input" rows="3"
+        placeholder="Beschreibe einen Block auf Deutsch, z.B. &quot;Regenbogen-Animation auf NeoPixel&quot; – Strg+Enter zum Senden"></textarea>
+      <button id="ai-send-btn" onclick="aiSend()">✨ Generieren</button>
+    </div>
+  </div>
+
+  <div id="ai-overlay" onclick="aiClose()"></div>
+
   <!-- App-Skripte -->
   <script src="js/boards.js"></script>
   <script src="js/blocks/control.js"></script>
-  <script src="js/blocks/sensors.js"></script>
-  <script src="js/blocks/actuators.js"></script>
+  <script src="js/blocks_db.js"></script>
+  <script src="js/block_builder.js"></script>
   <script src="js/toolbox.js"></script>
   <script src="js/generator.js"></script>
   <script src="js/serial.js"></script>
+  <script src="js/ai_chat.js"></script>
   <script src="js/app.js"></script>
 
   <!-- Resize-Divider Logik -->
